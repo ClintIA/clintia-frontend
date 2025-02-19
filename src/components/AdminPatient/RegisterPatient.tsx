@@ -280,7 +280,7 @@ const RegisterPatient: React.FC<RegisterPatientProps> = ({title, dadosIniciais, 
                                    </div>
                                </div>
                                <div className="grid grid-cols-4 items-center gap-4">
-                                   <Label htmlFor="health_card_number" className="text-right text-blue-800">
+                                   <Label htmlFor="health_card_number" className="text-right text-oxfordBlue00">
                                         Plano de Saúde
                                    </Label>
                                    <Input
@@ -292,7 +292,7 @@ const RegisterPatient: React.FC<RegisterPatientProps> = ({title, dadosIniciais, 
                                        className="col-span-3"/>
                                </div>
                                <div className="grid grid-cols-4 items-center gap-4">
-                                   <Label className="text-right text-blue-800" htmlFor="examId">Selecione o
+                                   <Label className="text-right text-oxfordBlue00" htmlFor="examId">Selecione o
                                        Canal de Captação</Label>
                                    <Select value={selectedCanal} onValueChange={setSelectedCanal}>
                                        <SelectTrigger className="col-span-3" id="canal">

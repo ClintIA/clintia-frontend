@@ -91,7 +91,7 @@ const RegisterBooking: React.FC<BookingModalProps> = ({title,dadosPaciente, isNe
                         if(result?.data.status === "success") {
                             if(result?.data.data.length === 0) {
                                 setDoctors(undefined)
-                                setErro('Não possui médico cadastrado para esse exame')
+                                setErro('Não possui profissional cadastrado para esse exame')
                                 setLoading(false)
 
                                 return
@@ -177,7 +177,7 @@ const RegisterBooking: React.FC<BookingModalProps> = ({title,dadosPaciente, isNe
 
             <Card className="w-full max-w-2xl mx-auto">
                 <CardHeader>
-                    <CardTitle className='text-xl text-blue-900'>{title}</CardTitle>
+                    <CardTitle className='text-xl text-oxfordBlue00'>{title}</CardTitle>
                     <CardDescription>
                         Preencha os detalhes do paciente abaixo. Clique em salvar para continuar.
                     </CardDescription>
@@ -186,7 +186,7 @@ const RegisterBooking: React.FC<BookingModalProps> = ({title,dadosPaciente, isNe
                     <form onSubmit={handleSubmit}>
                         <div className="grid gap-4">
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="full_name" className="text-right text-blue-800">
+                                <Label htmlFor="full_name" className="text-right text-oxfordBlue00">
                                     Nome
                                 </Label>
                                 <Input
@@ -198,7 +198,7 @@ const RegisterBooking: React.FC<BookingModalProps> = ({title,dadosPaciente, isNe
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="phone" className="text-right text-blue-800">
+                                <Label htmlFor="phone" className="text-right text-oxfordBlue00">
                                     Contato
                                 </Label>
                                 <Input
@@ -211,7 +211,7 @@ const RegisterBooking: React.FC<BookingModalProps> = ({title,dadosPaciente, isNe
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right text-blue-800" htmlFor="examId">Selecione o Exame</Label>
+                                <Label className="text-right text-oxfordBlue00" htmlFor="examId">Selecione o Exame</Label>
                                 <Select value={selectedExame} onValueChange={setSelectedExame}>
                                     <SelectTrigger className="col-span-3" id="examId">
                                         <SelectValue placeholder="Selecione o Exame"/>
@@ -226,12 +226,12 @@ const RegisterBooking: React.FC<BookingModalProps> = ({title,dadosPaciente, isNe
                                 </Select>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="doctor" className="text-right text-blue-800">
-                                    Selecione o Médico
+                                <Label htmlFor="doctor" className="text-right text-oxfordBlue00">
+                                    Selecione o Profissional
                                 </Label>
                                 <Select disabled={!doctors} value={selectedDoctor} onValueChange={setSelectedDoctor}>
                                     <SelectTrigger className="col-span-3" id="doctor">
-                                        <SelectValue placeholder="Selecione o Médico"/>
+                                        <SelectValue placeholder="Selecione o Profissional"/>
                                     </SelectTrigger>
                                     <SelectContent>
                                         {doctors?.map((doctor) => (
@@ -244,7 +244,7 @@ const RegisterBooking: React.FC<BookingModalProps> = ({title,dadosPaciente, isNe
                             </div>
 
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="examDate" className="text-right text-blue-800">
+                                <Label htmlFor="examDate" className="text-right text-oxfordBlue00">
                                     Dia do Exame
                                 </Label>
                                 <Input

@@ -375,14 +375,14 @@ export function AdminDashboard() {
               <CardHeader>
                 <CardTitle>Valores a receber</CardTitle>
                 <CardDescription>
-                  Informações detalhadas da quantidade de procedimentos realizadas por cada médico.
+                  Informações detalhadas da quantidade de procedimentos realizadas por cada profissional.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Nome do Médico</TableHead>
+                      <TableHead>Nome do Profissional</TableHead>
                       <TableHead>Procedimentos Realizados</TableHead>
                     </TableRow>
                   </TableHeader>

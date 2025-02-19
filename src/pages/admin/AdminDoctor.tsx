@@ -73,7 +73,7 @@ const AdminDoctor: React.FC = () => {
         setIsGeneralModalOpen(true)
     }
     const handleConfirmationDelete = (id: number) => {
-        setGeneralMessage("Deseja deletar o médico selecionado?")
+        setGeneralMessage("Deseja deletar o profissional selecionado?")
         setTitle('Confirmação de Exclusão')
         setAction('Excluir')
         setDeleteId(id)
@@ -86,7 +86,7 @@ const AdminDoctor: React.FC = () => {
             await deleteDoctor(deleteId,auth.tenantId).then(
                     (result) => {
                         if (result.message && result.message.includes('FK_')) {
-                            handleModalMessage('Não é possível deletar um médico com agendamento pendente')
+                            handleModalMessage('Não é possível deletar um profissional com agendamento pendente')
                             return
                         } else {
                             return fetchDoctors().then()
@@ -109,11 +109,11 @@ const AdminDoctor: React.FC = () => {
     const renderRow = (doctor: IAdmin) => (
         <>
             <TableCell className="text-oxfordBlue font-bold">{doctor.fullName}</TableCell>
-            <TableCell className="text-blue-900">{doctor.cpf}</TableCell>
-            <TableCell className="text-blue-900">{doctor.cep}</TableCell>
-            <TableCell className="text-blue-900">{doctor.email}</TableCell>
-            <TableCell className="text-blue-900">{doctor.phone}</TableCell>
-            <TableCell className="text-blue-900">{doctor.created_at ? format(doctor.created_at, "dd/MM/yyyy", { locale: ptBR }) : ''}</TableCell>
+            <TableCell className="text-oxfordBlue00">{doctor.cpf}</TableCell>
+            <TableCell className="text-oxfordBlue00">{doctor.cep}</TableCell>
+            <TableCell className="text-oxfordBlue00">{doctor.email}</TableCell>
+            <TableCell className="text-oxfordBlue00">{doctor.phone}</TableCell>
+            <TableCell className="text-oxfordBlue00">{doctor.created_at ? format(doctor.created_at, "dd/MM/yyyy", { locale: ptBR }) : ''}</TableCell>
 
         </>
     );
@@ -126,7 +126,7 @@ const AdminDoctor: React.FC = () => {
             </div>
             <div className="flex justify-items-start ml-2 mb-3">
                 <div>
-                    <Button onClick={() => openFlexiveModal('Cadastrar Médico', ModalType.newDoctorAdmin)}
+                    <Button onClick={() => openFlexiveModal('Cadastrar Profissional', ModalType.newDoctorAdmin)}
                             className="p-4 text-base bg-oxfordBlue text-white hover:bg-blue-900" type="submit">Adicionar
                         Médico</Button>
                 </div>

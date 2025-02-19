@@ -72,7 +72,7 @@ const AdminTenantExams: React.FC = () => {
             <TableCell className="text-oxfordBlue">{ exame.doctors.length > 0 ?
                 exame.doctors.map((doctor) => (<p key={doctor.id}>Dr(a). {doctor.fullName}</p>))
                 :
-                (<p>Não possuí médico cadastrado</p>)
+                (<p>Não possuí profissional cadastrado</p>)
             }
             </TableCell>
             <TableCell className="text-oxfordBlue capitalize">{exame.exam_type}</TableCell>
@@ -109,7 +109,7 @@ const AdminTenantExams: React.FC = () => {
                 await deleteExam(deleteId,auth.tenantId).then(
                     (result) => {
                         if(result.message && result.message.includes('FK_')){
-                            handleModalMessage('Não é possível deletar o procedimento que está relacionado com um médico')
+                            handleModalMessage('Não é possível deletar o procedimento que está relacionado com um profissional')
                             return
                         } else {
                             return fetchExams().then()
@@ -159,7 +159,7 @@ const AdminTenantExams: React.FC = () => {
                                                 <TableHead className="text-oxfordBlue">Profissionais</TableHead>
                                                 <TableHead className="text-oxfordBlue">Tipo do Procedimento</TableHead>
                                                 <TableHead className="text-oxfordBlue">Preço do Procedimento</TableHead>
-                                                <TableHead className="text-oxfordBlue">Valor do Médico</TableHead>
+                                                <TableHead className="text-oxfordBlue">Valor do Profissional</TableHead>
                                                 <TableHead className="text-oxfordBlue">Ação</TableHead>
                                             </TableRow>
                                         </TableHeader>

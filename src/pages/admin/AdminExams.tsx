@@ -122,10 +122,10 @@ const AdminExams: React.FC = () =>  {
   const renderRow = (exam: IPatientExam) => (
       <>
         <TableCell className="text-oxfordBlue font-bold">{exam?.patient?.full_name}</TableCell>
-        <TableCell className="text-blue-900">{exam?.exam?.exam_name}</TableCell>
-        <TableCell className="text-blue-900">{new Date(exam?.createdAt).toLocaleDateString()}</TableCell>
-        <TableCell className="text-blue-900">{new Date(exam?.examDate).toLocaleDateString()}</TableCell>
-        <TableCell className="text-blue-900">{translateStatus(exam?.status)}</TableCell>
+        <TableCell className="text-oxfordBlue00">{exam?.exam?.exam_name}</TableCell>
+        <TableCell className="text-oxfordBlue00">{new Date(exam?.createdAt).toLocaleDateString()}</TableCell>
+        <TableCell className="text-oxfordBlue00">{new Date(exam?.examDate).toLocaleDateString()}</TableCell>
+        <TableCell className="text-oxfordBlue00">{translateStatus(exam?.status)}</TableCell>
         <TableCell>
           <Button
               onClick={() => {

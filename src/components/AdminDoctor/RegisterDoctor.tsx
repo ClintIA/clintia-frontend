@@ -145,7 +145,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                 setExamesIDs([])
             }
         } catch (error) {
-            setErro('Falha ao cadastrar médico')
+            setErro('Falha ao cadastrar profissional')
             console.log(error)
         }
     }
@@ -155,7 +155,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
 
             <Card className="w-full max-w-2xl mx-auto">
                 <CardHeader>
-                    <CardTitle className='text-blue-900 text-xl'>{title}</CardTitle>
+                    <CardTitle className='text-oxfordBlue00 text-xl'>{title}</CardTitle>
                     <CardDescription className="text-gray-500">
                         Preencha os dados abaixo. Clique em salvar para finalizar o cadastro.
                     </CardDescription>
@@ -165,7 +165,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                     <form onSubmit={handleSubmit} className="space-y-2">
                         <div className="grid grid-cols-2 gap-2">
                             <div>
-                                <Label htmlFor="fullName" className="flex text-right text-blue-800 mb-2">
+                                <Label htmlFor="fullName" className="flex text-right text-oxfordBlue00 mb-2">
                                     Nome <CircleAlert className="ml-2" size={12} color={'red'}/>
                                 </Label>
                                 <span className="flex flex-col col-span-3">
@@ -182,7 +182,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                             </div>
                             <div>
                                 <div>
-                                    <Label htmlFor="cpf" className="flex text-right text-blue-800 mb-2">
+                                    <Label htmlFor="cpf" className="flex text-right text-oxfordBlue00 mb-2">
                                         CPF <CircleAlert className="ml-2" size={12} color={'red'}/>
                                     </Label>
                                     <span className="flex flex-col col-span-3">
@@ -202,7 +202,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
 
                         <div className="grid grid-cols-2 gap-2">
                             <div>
-                                <Label htmlFor="CRM" className="flex text-right text-blue-800 mb-2">
+                                <Label htmlFor="CRM" className="flex text-right text-oxfordBlue00 mb-2">
                                     CRM <CircleAlert className="ml-2" size={12} color={'red'}/>
                                 </Label>
                                 <span className="flex flex-col col-span-3">
@@ -215,11 +215,11 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                                     onChange={handleInputChange}
                                 />
                                      <span className="flex text-xs text-gray-500 mt-2"> <BadgeInfo className="mr-1"
-                                                                                                   size={12}/>Certificado de Registro Médico.</span>
+                                                                                                   size={12}/>Certificado de Registro Médico, caso possua.</span>
                                 </span>
                             </div>
                             <div>
-                                <Label htmlFor="occupation" className="flex text-right text-blue-800 mb-2">
+                                <Label htmlFor="occupation" className="flex text-right text-oxfordBlue00 mb-2">
                                     Ocupação <CircleAlert className="ml-2" size={12} color={'red'}/>
                                 </Label>
                                 <span className="flex flex-col">
@@ -237,7 +237,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                             <div>
-                                <Label htmlFor="fullName" className="flex text-right text-blue-800 mb-2">
+                                <Label htmlFor="fullName" className="flex text-right text-oxfordBlue00 mb-2">
                                     E-mail <CircleAlert className="ml-2" size={12} color={'red'}/>
                                 </Label>
                                 <span className="flex flex-col col-span-3">
@@ -253,7 +253,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                                    </span>
                             </div>
                             <div>
-                                <Label htmlFor="email" className="flex text-right text-blue-800 mb-2">
+                                <Label htmlFor="email" className="flex text-right text-oxfordBlue00 mb-2">
                                     CNPJ
                                 </Label>
                                 <span className="flex flex-col col-span-3">
@@ -271,7 +271,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                             <div>
-                                <Label htmlFor="phone" className="flex text-right text-blue-800 mb-2">
+                                <Label htmlFor="phone" className="flex text-right text-oxfordBlue00 mb-2">
                                     Telefone <CircleAlert className="ml-2" size={12} color={'red'}/>
                                 </Label>
                                 <span className="flex flex-col col-span-3">
@@ -287,7 +287,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                                    </span>
                             </div>
                             <div>
-                                <Label htmlFor="phone" className="flex text-right text-blue-800 mb-2">
+                                <Label htmlFor="phone" className="flex text-right text-oxfordBlue00 mb-2">
                                     CEP
                                 </Label>
                                 <span className="flex flex-col col-span-3">
@@ -305,7 +305,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                             <div>
-                                <Label htmlFor="gender" className="flex text-right text-blue-800 mb-2">
+                                <Label htmlFor="gender" className="flex text-right text-oxfordBlue00 mb-2">
                                     Deseja adicionar exame(s) ?
                                 </Label>
                                 <span className="flex flex-col mt-3">

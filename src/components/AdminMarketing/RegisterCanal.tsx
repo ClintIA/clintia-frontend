@@ -129,7 +129,7 @@ const RegisterCanal: React.FC<RegisterCanalProps> = ({title, isCanal, isUpdate, 
     return (
         <Card className="py-4 px-4">
             <CardHeader>
-                <CardTitle className='text-blue-900 text-xl'>{title}</CardTitle>
+                <CardTitle className='text-oxfordBlue00 text-xl'>{title}</CardTitle>
                 <CardDescription>
                     Gerenciamento de canais
                 </CardDescription>

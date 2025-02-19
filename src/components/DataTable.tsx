@@ -46,7 +46,7 @@ const DataTable = <T,>({ dataTable, openModalEdit, deleteData, openModalBooking,
                                             </Button>)}
                                         {Object.prototype.hasOwnProperty.call(data, 'CRM') ? (
                                             <Button
-                                                onClick={() => openModalEdit('Editar Médico',ModalType.editDoctorAdmin, data)}
+                                                onClick={() => openModalEdit('Editar Profissional',ModalType.editDoctorAdmin, data)}
                                                 className="w-full bg-oxfordBlue text-white"
                                             >
                                                 <Pencil className="mr-1 h-4 w-4" />

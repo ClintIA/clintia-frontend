@@ -1,4 +1,4 @@
-import React, { useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Button} from "@/components/ui/button.tsx"
 import {Input} from "@/components/ui/input.tsx"
 import {Label} from "@/components/ui/label.tsx"
@@ -8,6 +8,9 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx"
 import {useAuth} from "@/hooks/auth.tsx";
 import {validarTelefone} from "@/lib/utils.ts";
 import {genderOptions} from "@/lib/optionsFixed.ts";
+import {IMarketing} from "@/components/AdminMarketing/RegisterCanal.tsx";
+import {listCanalMarketing} from "@/services/marketingService.ts";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 
 
 
@@ -35,6 +38,8 @@ const LeadRegister: React.FC<LeadRegisterProps> = ({title, newLead}: LeadRegiste
         gender: '',
     })
     const [erro, setErro] = useState<string | null>(null)
+    const [canal, setCanal] = useState<IMarketing[]>([])
+    const [selectedCanal, setSelectedCanal] = useState<string | undefined>('')
 
     const auth = useAuth()
 
@@ -42,7 +47,19 @@ const LeadRegister: React.FC<LeadRegisterProps> = ({title, newLead}: LeadRegiste
         const { name, value } = e.target
         setLeadRegister(prev => ({ ...prev, [name]: value }))
     }
+    const fetchCanal = useCallback(async () => {
+        if (auth.tenantId) {
+            const result = await listCanalMarketing(auth.tenantId)
 
+            if (result.data) {
+                setCanal(result.data.data)
+            }
+
+        }
+    }, [auth.tenantId])
+    useEffect(   () => {
+        fetchCanal().then()
+    }, [fetchCanal]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -56,6 +73,7 @@ const LeadRegister: React.FC<LeadRegisterProps> = ({title, newLead}: LeadRegiste
             setErro('Telefone inválido')
              return
         }
+         leadRegister.canal = selectedCanal
 
         try {
             if(auth.tenantId) {
@@ -119,16 +137,20 @@ const LeadRegister: React.FC<LeadRegisterProps> = ({title, newLead}: LeadRegiste
                                        className="col-span-3"/>
                                </div>
                                <div className="grid grid-cols-4 items-center gap-4">
-                                   <Label htmlFor="obs" className="text-right text-oxfordBlue">
-                                       Canal
-                                   </Label>
-                                   <Input
-                                       id="canal"
-                                       name="canal"
-                                       type="text"
-                                       value={leadRegister.canal}
-                                       onChange={handleInputChange}
-                                       className="col-span-3"/>
+                                   <Label htmlFor="phone" className="text-right text-oxfordBlue">
+                                       Selecione o Canal de Captação</Label>
+                                   <Select value={selectedCanal} onValueChange={setSelectedCanal}>
+                                       <SelectTrigger className="col-span-3" id="canal">
+                                           <SelectValue placeholder="Selecione o Canal de Captação"/>
+                                       </SelectTrigger>
+                                       <SelectContent>
+                                           {canal.map((canal) => (
+                                               <SelectItem key={canal.id} value={canal.id ? canal.id.toString() : ''}>
+                                                   {canal.canal}
+                                               </SelectItem>
+                                           ))}
+                                       </SelectContent>
+                                   </Select>
                                </div>
                                <div className="grid grid-cols-4 items-center gap-4">
                                    <Label htmlFor="obs" className="text-right text-oxfordBlue">

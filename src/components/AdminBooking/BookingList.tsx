@@ -40,7 +40,7 @@ const BookingList: React.FC<ListaAgendamentosProps> = ({ agendamentos ,loading, 
                          <TableHead>Paciente</TableHead>
                          <TableHead>Hora</TableHead>
                          <TableHead>Procedimento</TableHead>
-                         <TableHead>Médico</TableHead>
+                         <TableHead>Profissional</TableHead>
                          <TableHead>Status</TableHead>
                          <TableHead>Ação</TableHead>
                      </TableRow>

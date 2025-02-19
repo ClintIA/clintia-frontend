@@ -107,12 +107,12 @@ const AdminList: React.FC = () => {
     const renderRow = (admin: IAdmin) => (
         <>
             <TableCell className="text-oxfordBlue font-bold">{admin.fullName}</TableCell>
-            <TableCell className="text-blue-900">{admin.cpf}</TableCell>
-            <TableCell className="text-blue-900">{admin.email}</TableCell>
-            <TableCell className="text-blue-900">{admin.cep ? admin.cep : 'Não possuí CEP cadastrado'}</TableCell>
-            <TableCell className="text-blue-900">{admin.phone}</TableCell>
-            <TableCell className="capitalize text-blue-900">{findRoleOptions(admin.role)}</TableCell>
-            <TableCell className="text-blue-900">{admin.created_at ? format(admin.created_at, "dd/MM/yyyy", { locale: ptBR }) : ''}</TableCell>
+            <TableCell className="text-oxfordBlue00">{admin.cpf}</TableCell>
+            <TableCell className="text-oxfordBlue00">{admin.email}</TableCell>
+            <TableCell className="text-oxfordBlue00">{admin.cep ? admin.cep : 'Não possuí CEP cadastrado'}</TableCell>
+            <TableCell className="text-oxfordBlue00">{admin.phone}</TableCell>
+            <TableCell className="capitalize text-oxfordBlue00">{findRoleOptions(admin.role)}</TableCell>
+            <TableCell className="text-oxfordBlue00">{admin.created_at ? format(admin.created_at, "dd/MM/yyyy", { locale: ptBR }) : ''}</TableCell>
 
         </>
     );
