@@ -8,9 +8,9 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx"
 import {useAuth} from "@/hooks/auth.tsx";
 import {validarTelefone} from "@/lib/utils.ts";
 import {genderOptions} from "@/lib/optionsFixed.ts";
-import {IMarketing} from "@/components/AdminMarketing/RegisterCanal.tsx";
 import {listCanalMarketing} from "@/services/marketingService.ts";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
+import {IMarketing} from "@/types/Marketing.ts";
 
 
 

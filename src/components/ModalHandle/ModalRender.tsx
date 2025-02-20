@@ -13,13 +13,12 @@ import RegisterAdmin from "@/components/AdminRegister/RegisterAdmin.tsx";
 import RegisterDoctor, {IDoctor} from "@/components/AdminDoctor/RegisterDoctor.tsx";
 import {IAdmin} from "@/types/dto/Admin.ts";
 import {registerDoctor, updateDoctor} from "@/services/doctorService.ts";
-import RegisterCanal, {IMarketing} from "@/components/AdminMarketing/RegisterCanal.tsx";
-import {registerCanalMarketing, updateCanalMarketing} from "@/services/marketingService.ts";
 import {createExam, updateExam} from "@/services/tenantExamService.tsx";
 import RegisterTenantExam, {IExam} from "@/components/AdminTenantExam/RegisterTenantExam.tsx";
 import {Exams} from "@/pages/admin/AdminTenantExams.tsx";
 import LeadRegister, {LeadRegisterDTO} from "@/components/AdminLeadRegister/LeadRegister.tsx";
 import {createRegisterLead} from "@/services/leadRegisterService.ts";
+import {IMarketing} from "@/types/Marketing.ts";
 
 
 interface ModalRegisterProps {
@@ -37,7 +36,7 @@ interface ModalRegisterProps {
 }
 
 
-const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, onClose, totalBudget, title,modalMessage,modalNewBookingConfirmation, type, data }: ModalRegisterProps) => {
+const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, onClose, title,modalMessage,modalNewBookingConfirmation, type, data }: ModalRegisterProps) => {
     const [open, setOpen] = useState(isOpen)
     const [modalContent,setModalContent] = useState<ModalType>(ModalType.newPatient)
     const [patientData, setPatientData] = useState<BookingConfirmationState>({} as BookingConfirmationState)
@@ -75,18 +74,7 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
             console.log(error)
         }
     }
-    const submitNewCanal = async (canalData: IMarketing, tenantId: number) => {
-       const result = await registerCanalMarketing(canalData,tenantId)
-        if(result.data) {
-            return
-        }
-    }
-    const submitUpdateNewCanal = async (canalData: IMarketing, tenantId: number) => {
-        const result = await updateCanalMarketing(canalData,tenantId)
-        if(result.data) {
-            return
-        }
-    }
+
     const submitBookintWithPatient = async (bookingDataWithPatient: BookingWithPatient, tenantId: number) => {
         try {
             if (modalNewBookingConfirmation) {
@@ -230,8 +218,6 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
                 return(<RegisterAdmin title={title} isAdmin={submitNewAdmin} />)
             case 'editAdmin':
                 return(<RegisterAdmin title={title} dadosIniciais={data} isUpdate={submitUpdateAdmin} />)
-            case 'newCanal':
-                return(<RegisterCanal title={title} totalBudget={totalBudget} isUpdate={submitUpdateNewCanal} isCanal={submitNewCanal}/>)
             case 'editExam':
                 return (<RegisterTenantExam title={title} isUpdate={submitUpdateExam} dadosIniciais={data} />)
             case 'newExam':

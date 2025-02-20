@@ -13,7 +13,7 @@ import {validarDataNascimento, validarEmail, validarTelefone} from "@/lib/utils.
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {genderOptions} from "@/lib/optionsFixed.ts";
 import {listCanalMarketing} from "@/services/marketingService.ts";
-import {IMarketing} from "@/components/AdminMarketing/RegisterCanal.tsx";
+import {IMarketing} from "@/types/Marketing.ts";
 
 export interface DadosPaciente {
     id?: number

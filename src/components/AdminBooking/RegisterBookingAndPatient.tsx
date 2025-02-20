@@ -17,9 +17,9 @@ import {Spinner} from "@/components/ui/Spinner.tsx";
 import {genderOptions} from "@/lib/optionsFixed.ts";
 import {isAxiosError} from "axios";
 import {DadosBooking} from "@/components/AdminBooking/RegisterBooking.tsx";
-import {IMarketing} from "@/components/AdminMarketing/RegisterCanal.tsx";
 import {listCanalMarketing} from "@/services/marketingService.ts";
 import {toast} from "@/hooks/use-toast.ts";
+import {IMarketing} from "@/types/Marketing.ts";
 
 export interface Exams {
     id: number

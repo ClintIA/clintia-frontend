@@ -13,12 +13,12 @@ import {
     updateCanalMarketing
 } from "@/services/marketingService.ts";
 import {useAuth} from "@/hooks/auth.tsx";
-import {IMarketing} from "@/components/AdminMarketing/RegisterCanal.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import CardMarketing from "@/components/CardMarketing.tsx";
 import {BadgeInfo} from "lucide-react";
 import {Spinner} from "@/components/ui/Spinner.tsx";
 import {ToastAction} from "@/components/ui/toast.tsx";
+import {IMarketing} from "@/types/Marketing.ts";
 
 ChartJS.register(ArcElement, Tooltip, Legend,ChartDataLabels)
 

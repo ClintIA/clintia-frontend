@@ -1,6 +1,6 @@
 import apiClient from "@/lib/interceptor.ts";
-import {IMarketing} from "@/components/AdminMarketing/RegisterCanal.tsx";
 import {isAxiosError} from "axios";
+import {IMarketing} from "@/types/Marketing.ts";
 
 export interface MarketingFilters {
         startDate?: string
