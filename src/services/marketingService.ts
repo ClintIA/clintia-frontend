@@ -45,7 +45,7 @@ export const registerCanalMarketing = async(canal: IMarketing, tenantID: number)
     })
 }
 export const updateCanalMarketing = async(canal: IMarketing, tenantID: number) => {
-    return await apiClient.put('admin/marketing/canal', canal, {
+    return await apiClient.post('admin/marketing/data', canal, {
         headers: {
             'x-tenant-id': tenantID
         }

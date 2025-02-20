@@ -10,10 +10,13 @@ import GeneralModal from "@/components/ModalHandle/GeneralModal.tsx";
 
 export interface IMarketing {
     id?: number
-    canal: string
-    budgetCanal: string
+    canal?: string
+    budgetCanal?: string
     createdBy?: number
     uploadBy?: number
+    cost?: string;
+    leads?: number;
+    clicks?: number;
 }
 
 export interface RegisterCanalProps {
