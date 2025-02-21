@@ -88,13 +88,13 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, i
     }
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if(!examData.exam_name || !examData.price || !examData.doctorPrice) {
+        if(!examData.exam_name || !examData.price) {
             setErro('Por favor, preencha todos os campos')
             return
         }
         const newExam = {...examData,
             price: examData.price.replace(',', '.'),
-            doctorPrice: examData.doctorPrice.replace(',', '.'),
+            doctorPrice: examData.doctorPrice?.replace(',', '.') || '',
             doctors: selectedDoctors,
         }
 
