@@ -232,7 +232,7 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
                 isStepper={isStepper}
                 currentStep={currentStep}
                 onClose={handleClose}
-                title="Gerenciamento">
+                title="Agendamento">
                 {renderModalContent()}
             </ModalFlexivel>
     )

@@ -27,4 +27,4 @@ export const findRoleOptions = (canal?: string) => {
     }
 }
 
-export const steps = ['CPF', 'Cadastro','Agendamento']
+export const steps = ['Cadastro', 'Agendamento','Finalizado']

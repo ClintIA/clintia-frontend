@@ -180,9 +180,12 @@ const AdminHome: React.FC = () => {
   return (
       <div className="pt-8 w-full max-w-full min-h-screen flex flex-col justify-center mx-auto">
         <div className="flex justify-between p-5">
-          <Button onClick={() => openFlexiveModal('Registro de Lead',ModalType.newLead)}
-                  className="bg-oxfordBlue w-44 h-14 text-white font-bold p-2 hover:bg-blue-900" type="submit">REGISTRAR CONTATO</Button>
-          <p className="text-oxfordBlue font-medium ml-10">Unidade: <strong>{auth.tenantName} </strong></p>
+        <Button
+            onClick={() => openFlexiveModal('Agendamento de Procedimento', ModalType.newBookingPatient)}
+            className="bg-oxfordBlue text-white hover:bg-blue-900" type="submit">Realizar
+            Agendamento
+        </Button>
+        <p className="text-oxfordBlue font-medium ml-10">Unidade: <strong>{auth.tenantName} </strong></p>
         </div>
         <main className="flex-1 p-4 md:p-6 overflow-x-hidden">
           <div className="max-w-full mx-auto space-y-6">

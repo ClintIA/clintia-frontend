@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {useCallback, useEffect, useState} from 'react'
 import {Button} from "@/components/ui/button.tsx"
 import {Input} from "@/components/ui/input.tsx"
@@ -131,7 +132,7 @@ const LeadRegister: React.FC<LeadRegisterProps> = ({title, newLead}: LeadRegiste
                                        id="phone"
                                        name="phone"
                                        type="tel"
-                                       placeholder='22999999999'
+                                       placeholder='Insira o telefone do paciente com DDD'
                                        value={leadRegister.phone}
                                        onChange={handleInputChange}
                                        className="col-span-3"/>

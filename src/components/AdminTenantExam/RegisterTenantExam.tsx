@@ -39,6 +39,9 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, i
     const [doctors, setDoctors] = useState<IDoctor[]>([])
     const [erro, setErro] = useState<string | null>(null)
     const [doctorIDs, setDoctorsIDs ] = useState<number[]>([])
+    const [doctorPaymentType, setDoctorPaymentType] = useState<string>("fixed");
+    const [doctorFixedPrice, setDoctorFixedPrice] = useState<string>("");
+    const [doctorPercentage, setDoctorPercentage] = useState<string>("");
     const auth = useAuth()
 
     useEffect(() => {
@@ -92,9 +95,20 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, i
             setErro('Por favor, preencha todos os campos')
             return
         }
+
+        let doctorFinalPrice = "";
+
+        if (doctorPaymentType === "percentage" && doctorPercentage) {
+            const price = parseFloat(examData.price.replace(',', '.'));
+            const percentage = parseFloat(doctorPercentage) / 100;
+            doctorFinalPrice = (price * percentage).toFixed(2);
+        } else if (doctorPaymentType === "fixed" && doctorFixedPrice) {
+            doctorFinalPrice = doctorFixedPrice.replace(',', '.');
+        }
+
         const newExam = {...examData,
             price: examData.price.replace(',', '.'),
-            doctorPrice: examData.doctorPrice?.replace(',', '.') || '',
+            doctorPrice: doctorFinalPrice,
             doctors: selectedDoctors,
         }
 
@@ -121,7 +135,7 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, i
                 <CardHeader>
                     <CardTitle className='text-oxfordBlue text-xl'>{title}</CardTitle>
                     <CardDescription>
-                        Preencha os dados do procedimento. Clique em salvar quando terminar.
+                        Preencha os dados do procedimento. Clique em cadastrar quando terminar.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -187,20 +201,57 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, i
                                     className="col-span-3"/>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="doctorPrice" className="text-right text-oxfordBlue">
-                                    Valor do Profissiona
-                                </Label>
-                                <Input
-                                    id="doctorPrice"
-                                    name="doctorPrice"
-                                    type="text"
-                                    value={examData?.doctorPrice}
-                                    onChange={handleInputChange}
-                                    placeholder="0.00"
-                                />
+                                <Label className="text-right text-oxfordBlue">Pagamento do Profissional</Label>
+                                <div className="flex flex-row gap-2">
+                                    <label className="flex items-center space-x-3 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="doctorPaymentType"
+                                            value="fixed"
+                                            checked={doctorPaymentType === "fixed"}
+                                            onChange={() => setDoctorPaymentType("fixed")}
+                                        />
+                                        <span className="w-max text-sm text-oxfordBlue">Valor Fixo</span>
+                                    </label>
+                                    <label className="flex items-center space-x-3 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="doctorPaymentType"
+                                            value="percentage"
+                                            checked={doctorPaymentType === "percentage"}
+                                            onChange={() => setDoctorPaymentType("percentage")}
+                                        />
+                                        <span className="w-max text-sm text-oxfordBlue">Porcentagem</span>
+                                    </label>
+                                </div>
                             </div>
 
+                            {doctorPaymentType === "fixed" && (
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label className="text-right text-oxfordBlue">Valor Fixo</Label>
+                                    <Input
+                                        name="doctorFixedPrice"
+                                        placeholder="Valor fixo do profissional"
+                                        value={doctorFixedPrice}
+                                        onChange={(e) => setDoctorFixedPrice(e.target.value)}
+                                        className="col-span-3"
+                                    />
+                                </div>
+                            )}
+                            {doctorPaymentType === "percentage" && (
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label className="text-right text-oxfordBlue">Porcentagem</Label>
+                                    <Input
+                                        name="doctorPercentage"
+                                        placeholder="% do valor do exame"
+                                        value={doctorPercentage}
+                                        onChange={(e) => setDoctorPercentage(e.target.value)}
+                                        className="col-span-3"
+                                    />
+                                </div>
+                            )}
                         </div>
+
                         <div className="flex justify-end mt-6">
                             {isNewExam && (
                                 <Button className="bg-oxfordBlue text-white" type="submit">Cadastrar Procedimento</Button>)}

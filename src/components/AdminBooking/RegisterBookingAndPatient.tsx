@@ -21,6 +21,7 @@ import {DadosBooking} from "@/components/AdminBooking/RegisterBooking.tsx";
 import {listCanalMarketing} from "@/services/marketingService.ts";
 import {toast} from "@/hooks/use-toast.ts";
 import {IMarketing} from "@/types/Marketing.ts";
+import { createRegisterLead } from '@/services/leadRegisterService'
 
 export interface Exams {
     id: number
@@ -301,6 +302,45 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
         return <Loading />
     }
 
+
+    const handleRegisterLead = async () => {
+        setErro(null);
+    
+    
+        if (!patientData?.full_name || !phone || !selectedCanal) {
+            setErro('Preencha pelo menos Nome, Telefone e Canal antes de registrar o contato.');
+            return;
+        }
+    
+        try {
+            if (auth.tenantId) {
+                const contactData = {
+                    full_name: patientData.full_name,
+                    phone: phone,
+                    canal: selectedCanal,
+                };
+    
+                const response = await createRegisterLead(contactData, auth.tenantId);
+    
+                if (response.status === 201) {
+                    toast({
+                        title: 'Sucesso!',
+                        description: 'Contato registrado com sucesso.',
+                    });
+                    setPatientData(undefined);
+                    setPhone('');
+                    setSelectedCanal('');
+                } else {
+                    setErro('Erro ao registrar contato.');
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            setErro('Falha ao registrar o contato.');
+        }
+    };
+    
+
     return (
         <div className="mt-6">
 
@@ -322,7 +362,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                     <Input
                                         id="phone"
                                         name="phone"
-                                        placeholder="22999999999"
+                                        placeholder="Insira o telefone do paciente com DDD"
                                         value={phone}
                                         onChange={handleInputCpf}
                                         className="col-span-3"
@@ -525,8 +565,13 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                 />
                             </div>
                         </div>
-                        <div className="flex justify-end mt-6">
-                            <Button className="bg-oxfordBlue text-white" type="submit">Salvar Agendamento</Button>
+                        <div className="flex justify-between mt-12 gap-4">
+                            <Button className="bg-oxfordBlue text-white w-70" type="button" onClick={handleRegisterLead}>
+                                Registrar Contato
+                            </Button>
+                            <Button className="bg-oxfordBlue text-white w-70" type="submit">
+                                Salvar Agendamento
+                            </Button>
                         </div>
                     </form>
                 </CardContent>
