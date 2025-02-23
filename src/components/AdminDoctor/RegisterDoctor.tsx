@@ -32,7 +32,7 @@ export interface IDoctor {
     occupation?: string;
     sessionToken?: string;
     created_at?: string;
-    tenant?: any[];
+    tenant?: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
     exams?: number[];
 }
 
@@ -76,7 +76,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                 if(addExam) {
                     const result = await listTenantExam(auth.tenantId)
                     if(result?.data.data.length === 0 ) {
-                        setErro('Não possui exames cadastrados')
+                        setErro('Não possui procedimentos cadastrados')
                         return
                     }
                     if(result?.data.status === "success") {
@@ -87,7 +87,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
 
             }
         } catch (error) {
-            setErro("Não possível carregar os exames")
+            setErro("Não possível carregar os procedimentos")
             console.error(error)
         }
     }
@@ -206,7 +206,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                         <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <Label htmlFor="CRM" className="flex text-right text-oxfordBlue00 mb-2">
-                                    CRM <CircleAlert className="ml-2" size={12} color={'red'}/>
+                                    RPS <CircleAlert className="ml-2" size={12} color={'red'}/>
                                 </Label>
                                 <span className="flex flex-col col-span-3">
 
@@ -218,7 +218,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                                     onChange={handleInputChange}
                                 />
                                      <span className="flex text-xs text-gray-500 mt-2"> <BadgeInfo className="mr-1"
-                                                                                                   size={12}/>Certificado de Registro Médico, caso possua.</span>
+                                                                                                   size={12}/>Registro do profissional: CRM, CREFITO, etc...</span>
                                 </span>
                             </div>
                             <div>
@@ -321,7 +321,7 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                                     />
                                 </div>
                                     <span className="flex text-xs text-gray-500 mt-2"> <BadgeInfo
-                                        className="mr-1" size={12}/> Selecione para adicionar exames.</span>
+                                        className="mr-1" size={12}/> Selecione para adicionar procedimentos.</span>
                                    </span>
                             </div>
                         </div>

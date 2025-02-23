@@ -163,8 +163,7 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, i
                                 </div>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right text-oxfordBlue" htmlFor="doctorId">Selecione o(s)
-                                    Médico(s)</Label>
+                                <Label className="text-right text-oxfordBlue" htmlFor="doctorId">Selecione um ou mais profissionais</Label>
                                 <MultiSelect
                                     options={doctors}
                                     atribbute="fullName"

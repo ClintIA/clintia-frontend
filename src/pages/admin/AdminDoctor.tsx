@@ -128,7 +128,7 @@ const AdminDoctor: React.FC = () => {
                 <div>
                     <Button onClick={() => openFlexiveModal('Cadastrar Profissional', ModalType.newDoctorAdmin)}
                             className="p-4 text-base bg-oxfordBlue text-white hover:bg-blue-900" type="submit">Adicionar
-                        Médico</Button>
+                        Profissional da Saúde</Button>
                 </div>
             </div>
             <Card>

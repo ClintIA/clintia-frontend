@@ -134,12 +134,12 @@ export function Exames() {
       <div className={styles.wrapper}>
         <main>
           <div>
-            <h1 className={styles.title}>Resultado de Exames</h1>
+            <h1 className={styles.title}>Resultado de Procedimentos</h1>
             <ConsultorioDropdown consultorios={consultorios} onSelectConsultorio={handleSelectConsultorio} />
           </div>
 
           {filteredExames.length === 0 ? (
-          <p className={styles.noExamsMessage}>Sem exames cadastrados</p>
+          <p className={styles.noExamsMessage}>Sem procedimentos cadastrados</p>
         ) : (
           filteredExames.map(exame => (
             <Post
