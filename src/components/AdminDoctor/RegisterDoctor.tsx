@@ -70,10 +70,10 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
             }))
         }
     }, [dadosIniciais])
-    useEffect( () => {
-        const fetchExams = async () => {
-            try {
-                if(auth.tenantId) {
+    const fetchExams = async () => {
+        try {
+            if(auth.tenantId) {
+                if(addExam) {
                     const result = await listTenantExam(auth.tenantId)
                     if(result?.data.data.length === 0 ) {
                         setErro('Não possui exames cadastrados')
@@ -84,13 +84,16 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                         setErro(null)
                     }
                 }
-            } catch (error) {
-                setErro("Não possível carregar os exames")
-                console.error(error)
+
             }
+        } catch (error) {
+            setErro("Não possível carregar os exames")
+            console.error(error)
         }
+    }
+    useEffect( () => {
         fetchExams().then()
-    }, [auth.tenantId]);
+    }, [addExam]);
     const handleSelectedExames = (exames: number[]) => {
         setSelectedExame(exames)
     }
@@ -101,7 +104,6 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
         if (!doctorData.fullName ||
             !doctorData.cep ||
             !doctorData.occupation ||
-            !doctorData.cnpj ||
             !doctorData.CRM ||
             !doctorData.phone ||
             !doctorData.cpf) {
@@ -123,11 +125,12 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                 if(isUpdate) {
                     await isUpdate(doctorData, auth.tenantId)
                         .catch((error) => console.log(error))
-                    return
+
                 }
                 if(isDoctor) {
                     await isDoctor({...doctorData, exams: selectedExame}, auth.tenantId)
                         .catch((error) => console.log(error))
+
                 }
 
                 setDoctorData({
