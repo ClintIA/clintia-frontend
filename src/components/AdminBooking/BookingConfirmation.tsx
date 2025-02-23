@@ -50,8 +50,8 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({ dadosBooking,
                         </div>
                         <div className="flex items-center">
                             <User className="mr-2 h-4 w-4 opacity-70"/>
-                            <span className="font-semibold">Médico:</span>
-                            <span className="ml-2">{dadosBooking.doctor? dadosBooking.doctor : 'Medico não informado'}</span>
+                            <span className="font-semibold">Profissional:</span>
+                            <span className="ml-2">{dadosBooking.doctor? dadosBooking.doctor : 'Profissional não informado'}</span>
                         </div>
                         <div className="flex items-center">
                             <CalendarDays className="mr-2 h-4 w-4 opacity-70"/>

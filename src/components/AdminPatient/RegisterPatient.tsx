@@ -13,7 +13,7 @@ import {validarDataNascimento, validarEmail, validarTelefone} from "@/lib/utils.
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {genderOptions} from "@/lib/optionsFixed.ts";
 import {listCanalMarketing} from "@/services/marketingService.ts";
-import {IMarketing} from "@/components/AdminMarketing/RegisterCanal.tsx";
+import {IMarketing} from "@/types/Marketing.ts";
 
 export interface DadosPaciente {
     id?: number
@@ -280,7 +280,7 @@ const RegisterPatient: React.FC<RegisterPatientProps> = ({title, dadosIniciais, 
                                    </div>
                                </div>
                                <div className="grid grid-cols-4 items-center gap-4">
-                                   <Label htmlFor="health_card_number" className="text-right text-blue-800">
+                                   <Label htmlFor="health_card_number" className="text-right text-oxfordBlue00">
                                         Plano de Saúde
                                    </Label>
                                    <Input
@@ -292,7 +292,7 @@ const RegisterPatient: React.FC<RegisterPatientProps> = ({title, dadosIniciais, 
                                        className="col-span-3"/>
                                </div>
                                <div className="grid grid-cols-4 items-center gap-4">
-                                   <Label className="text-right text-blue-800" htmlFor="examId">Selecione o
+                                   <Label className="text-right text-oxfordBlue00" htmlFor="examId">Selecione o
                                        Canal de Captação</Label>
                                    <Select value={selectedCanal} onValueChange={setSelectedCanal}>
                                        <SelectTrigger className="col-span-3" id="canal">

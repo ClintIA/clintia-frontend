@@ -102,7 +102,7 @@ const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUp
                 setSelectedRole('')
             }
         } catch (error) {
-            setErro('Falha ao cadastrar médico')
+            setErro('Falha ao cadastrar profissional')
             console.log(error)
         }
     }
@@ -112,7 +112,7 @@ const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUp
 
                <Card className="w-full max-w-2xl mx-auto">
                    <CardHeader>
-                       <CardTitle className='text-blue-900 text-xl'>{title}</CardTitle>
+                       <CardTitle className='text-oxfordBlue00 text-xl'>{title}</CardTitle>
                        <CardDescription>
                            Preencha os dados abaixo. Clique em salvar para finalizar o cadastro.
                        </CardDescription>
@@ -122,7 +122,7 @@ const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUp
 
                            <div className="grid gap-4">
                                <div className="grid grid-cols-4 items-center gap-4">
-                                   <Label htmlFor="cpf" className="text-right text-blue-800">
+                                   <Label htmlFor="cpf" className="text-right text-oxfordBlue00">
                                        Nome
                                    </Label>
                                    <span className="flex flex-col col-span-3">
@@ -137,7 +137,7 @@ const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUp
                                    </span>
                                </div>
                                <div className="grid grid-cols-4 items-center gap-4">
-                                   <Label htmlFor="cpf" className="text-right text-blue-800">
+                                   <Label htmlFor="cpf" className="text-right text-oxfordBlue00">
                                        CPF
                                    </Label>
                                    <span className="flex flex-col col-span-3">
@@ -152,7 +152,7 @@ const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUp
                                    </span>
                                </div>
                                <div className="grid grid-cols-4 items-center gap-4">
-                                   <Label htmlFor="email" className="text-right text-blue-800">
+                                   <Label htmlFor="email" className="text-right text-oxfordBlue00">
                                        Email
                                    </Label>
                                    <span className="flex flex-col col-span-3">
@@ -167,7 +167,7 @@ const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUp
                                    </span>
                                </div>
                                <div className="grid grid-cols-4 items-center gap-4">
-                                   <Label htmlFor="email" className="text-right text-blue-800">
+                                   <Label htmlFor="email" className="text-right text-oxfordBlue00">
                                        CEP
                                    </Label>
                                    <span className="flex flex-col col-span-3">
@@ -182,7 +182,7 @@ const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUp
                                    </span>
                                </div>
                                <div className="grid grid-cols-4 items-center gap-4">
-                                   <Label htmlFor="phone" className="text-right text-blue-800">
+                                   <Label htmlFor="phone" className="text-right text-oxfordBlue00">
                                        Telefone
                                    </Label>
                                    <span className="flex flex-col col-span-3">
@@ -197,7 +197,7 @@ const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUp
                                    </span>
                                </div>
                                <div className="grid grid-cols-4 items-center gap-4">
-                                   <Label htmlFor="gender" className="text-right text-blue-800">
+                                   <Label htmlFor="gender" className="text-right text-oxfordBlue00">
                                        Perfil
                                    </Label>
 

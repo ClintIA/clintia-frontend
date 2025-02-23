@@ -17,9 +17,9 @@ import {Spinner} from "@/components/ui/Spinner.tsx";
 import {genderOptions} from "@/lib/optionsFixed.ts";
 import {isAxiosError} from "axios";
 import {DadosBooking} from "@/components/AdminBooking/RegisterBooking.tsx";
-import {IMarketing} from "@/components/AdminMarketing/RegisterCanal.tsx";
 import {listCanalMarketing} from "@/services/marketingService.ts";
 import {toast} from "@/hooks/use-toast.ts";
+import {IMarketing} from "@/types/Marketing.ts";
 
 export interface Exams {
     id: number
@@ -305,7 +305,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
 
             <Card className="w-full max-w-2xl mx-auto">
                 <CardHeader>
-                    <CardTitle className='text-xl text-blue-900'>{title}</CardTitle>
+                    <CardTitle className='text-xl text-oxfordBlue'>{title}</CardTitle>
                     <CardDescription>
                         Preencha os detalhes do paciente abaixo. Clique em salvar para continuar.
                     </CardDescription>
@@ -315,7 +315,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                         <div className="grid gap-4">
                             <div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="cpf" className="text-right text-blue-800">
+                                    <Label htmlFor="cpf" className="text-right text-oxfordBlue">
                                         Telefone
                                     </Label>
                                     <Input
@@ -343,7 +343,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                             </div>
                             <div className={showForm ? 'grid gap-2' : 'hidden'}>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="full_name" className="text-right text-blue-800">
+                                    <Label htmlFor="full_name" className="text-right text-oxfordBlue">
                                         Nome
                                     </Label>
                                     <Input
@@ -355,7 +355,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                     />
                                 </div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="phone" className="text-right text-blue-800">
+                                    <Label htmlFor="phone" className="text-right text-oxfordBlue">
                                         CPF
                                     </Label>
                                     <Input
@@ -367,7 +367,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                     />
                                 </div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="email" className="text-right text-blue-800">
+                                    <Label htmlFor="email" className="text-right text-oxfordBlue">
                                         Email
                                     </Label>
                                     <Input
@@ -379,7 +379,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                     />
                                 </div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="health_card_number" className="text-right text-blue-800">
+                                    <Label htmlFor="health_card_number" className="text-right text-oxfordBlue">
                                         Plano de Saúde
                                     </Label>
                                     <Input
@@ -392,7 +392,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                     />
                                 </div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="dob" className="text-right text-blue-800">
+                                    <Label htmlFor="dob" className="text-right text-oxfordBlue">
                                         Data de Nascimento
                                     </Label>
                                     <Input
@@ -405,7 +405,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                     />
                                 </div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="cep" className="text-right text-blue-800">
+                                    <Label htmlFor="cep" className="text-right text-oxfordBlue">
                                         CEP
                                     </Label>
                                     <Input
@@ -418,7 +418,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                     />
                                 </div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="cep" className="text-right text-blue-800">
+                                    <Label htmlFor="cep" className="text-right text-oxfordBlue">
                                         Diagnóstico
                                     </Label>
                                     <Input
@@ -431,7 +431,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                     />
                                 </div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="gender" className="text-right text-blue-800">
+                                    <Label htmlFor="gender" className="text-right text-oxfordBlue">
                                         Genero
                                     </Label>
                                     <div className="flex flex-row gap-2">
@@ -447,16 +447,16 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                                     value={option.value}
                                                     checked={patientData?.gender === option.value}
                                                     onChange={handleInputChange}
-                                                    className="form-radio h-4 w-4 text-blue-800 focus:ring-blue-800 border-gray-300"
+                                                    className="form-radio h-4 w-4 text-oxfordBlue focus:ring-blue-800 border-gray-300"
                                                 />
                                                 <span
-                                                    className="w-max text-sm text-blue-800">{option.label}</span>
+                                                    className="w-max text-sm text-oxfordBlue">{option.label}</span>
                                             </label>
                                         ))}
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label className="text-right text-blue-800" htmlFor="examId">Selecione o
+                                    <Label className="text-right text-oxfordBlue" htmlFor="examId">Selecione o
                                         Canal de Captação</Label>
                                     <Select value={selectedCanal} onValueChange={setSelectedCanal}>
                                         <SelectTrigger className="col-span-3" id="canal">
@@ -473,7 +473,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                 </div>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right text-blue-800" htmlFor="examId">Selecione o Exame</Label>
+                                <Label className="text-right text-oxfordBlue" htmlFor="examId">Selecione o Exame</Label>
                                 <Select disabled={!patientData} value={selectedExame} onValueChange={setSelectedExame}>
                                     <SelectTrigger className="col-span-3" id="examId">
                                         <SelectValue placeholder="Selecione o Exame"/>
@@ -488,8 +488,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                 </Select>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="doctor" className="text-right text-blue-800">
-                                Selecione o Médico
+                            <Label htmlFor="doctor" className="text-right text-oxfordBlue">
+                                Selecione o Profissional
                             </Label>
                             {isLoading  ? (
                                 <div className="grid grid-cols-4 items-center gap-4">
@@ -498,7 +498,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                             ) : (
                                 <Select disabled={!patientData} value={selectedDoctor} onValueChange={setSelectedDoctor}>
                                     <SelectTrigger className="col-span-3" id="doctor">
-                                        <SelectValue placeholder="Selecione o Médico"/>
+                                        <SelectValue placeholder="Selecione o Profissional"/>
                                     </SelectTrigger>
                                     <SelectContent>
                                         {doctors?.map((doctor) => (
@@ -512,7 +512,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                         </div>
 
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="examDate" className="text-right text-blue-800">
+                                <Label htmlFor="examDate" className="text-right text-oxfordBlue00">
                                     Dia do Exame
                                 </Label>
                                 <Input

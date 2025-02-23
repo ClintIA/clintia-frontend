@@ -1,6 +1,6 @@
 import apiClient from "@/lib/interceptor.ts";
-import {IMarketing} from "@/components/AdminMarketing/RegisterCanal.tsx";
 import {isAxiosError} from "axios";
+import {IMarketing} from "@/types/Marketing.ts";
 
 export interface MarketingFilters {
         startDate?: string
@@ -21,7 +21,6 @@ export const listCanalMarketing = async (tenantID: number) => {
         }
     })
 }
-
 export const getBudgetCanal = async(tenantID: number ) => {
     return await apiClient.get('/admin/marketing/tenantBudget', {
         headers: {
@@ -46,7 +45,7 @@ export const registerCanalMarketing = async(canal: IMarketing, tenantID: number)
     })
 }
 export const updateCanalMarketing = async(canal: IMarketing, tenantID: number) => {
-    return await apiClient.put('admin/marketing/canal', canal, {
+    return await apiClient.post('admin/marketing/data', canal, {
         headers: {
             'x-tenant-id': tenantID
         }

@@ -12,7 +12,7 @@ export const roleOptions = [
     { value: 'admin', label: 'Admin', disable: false},
     { value: 'marketing', label: 'Marketing', disable: false },
     { value: 'default', label: 'Atendente', disable: false },
-    { value: 'doctor', label: 'Médico', disable: true },
+    { value: 'doctor', label: 'Profissional da Saúde', disable: true },
     { value: 'patient', label: 'Paciente', disable: true }
 ];
 export const findRoleOptions = (canal?: string) => {

@@ -33,7 +33,8 @@ module.exports = {
 			},
     		colors: {
     			skyBlue: '#05D2FF',
-    			celticBlue: '#055AAA',
+				lightBlue: '#DAE6F0',
+				celticBlue: '#055AAA',
     			dodgerBlue: '#0578DC',
     			yaleBlue: '#053C73',
     			oxfordBlue: '#051E32',

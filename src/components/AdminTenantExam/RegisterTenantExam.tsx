@@ -170,7 +170,7 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, i
                                     atribbute="fullName"
                                     onValueChange={handleSelectedDoctors}
                                     defaultValue={doctorIDs}
-                                    placeholder="Selecione o(s) médico(s)"
+                                    placeholder="Selecione o(s) profissional(s)"
                                     variant="inverted"
                                 />
                             </div>
@@ -189,7 +189,7 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, i
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="doctorPrice" className="text-right text-oxfordBlue">
-                                    Valor do Médico
+                                    Valor do Profissiona
                                 </Label>
                                 <Input
                                     id="doctorPrice"
