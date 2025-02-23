@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {useCallback, useEffect, useState} from 'react'
 import {Button} from "@/components/ui/button.tsx"
 import {Input} from "@/components/ui/input.tsx"
@@ -108,7 +109,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                     setLoading(true)
                     const result = await listTenantExam(auth.tenantId)
                     if(result?.data.data.length === 0 ) {
-                        setErro('Não possui exames cadastrados')
+                        setErro('Não possui procedimentos cadastrados')
                         setLoading(false)
                         return
                     }
@@ -120,7 +121,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                     }
                 }
             } catch (error) {
-                setErro("Não possível carregar os exames")
+                setErro("Não possível carregar os procedimentos")
                 console.error(error)
             }
         }

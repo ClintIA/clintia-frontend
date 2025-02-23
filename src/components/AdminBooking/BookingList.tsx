@@ -15,7 +15,7 @@ const BookingList: React.FC<ListaAgendamentosProps> = ({ agendamentos ,loading, 
         return (<Loading />)
     }
     if(agendamentos.length === 0) {
-        return (<p className="text-base font-semibold">Não possuí exames para o dia selecionado</p>)
+        return (<p className="text-base font-semibold">Não possuí procedimentos para o dia selecionado</p>)
     }
 
     const handleConfirmarPresenca = (id: number, presence: null | 'Sim' | 'Não') => {

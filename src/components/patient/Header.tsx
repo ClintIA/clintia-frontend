@@ -30,7 +30,7 @@ export function Header() {
         <nav className={`${styles.nav} ${menuOpen ? styles.open : ''}`}>
           <NavLink to="/paciente/home" title="Exames" onClick={() => setMenuOpen(false)}>
             <Flask className={styles.icon}  />
-            Exames
+            Procedimentos
           </NavLink>
           <NavLink to="/paciente/dadoscadastrais" title="Dados Cadastrais" onClick={() => setMenuOpen(false)}>
             <UserCircleGear className={styles.icon}  />
