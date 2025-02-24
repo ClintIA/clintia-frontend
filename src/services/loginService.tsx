@@ -48,7 +48,15 @@ export const loginServiceWithTenant = async (user: string, tenant: number): Prom
 export const registerPatient = async (patientData: DadosPaciente, tenantId: number) => {
     let data;
     if(patientData.cpf) {
-        data =  {...patientData, cpf: patientData.cpf.replace(/\D/g, '')};
+        data =  {...patientData,
+            cpf: patientData.cpf.replace(/\D/g, ''),
+            phone: patientData.phone?.replace(/\D/g, ''),
+            cep: patientData.cep?.replace(/\D/g, '')
+        };
+    } else {
+        data =  {...patientData,
+            phone: patientData.phone?.replace(/\D/g, ''),
+        };
     }
     try {
         return await apiClient.post('admin/register/patient', data,{
