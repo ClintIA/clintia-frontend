@@ -578,7 +578,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                         </div>)}
                     </form>
                 </CardContent>
-                <CardFooter
+                <CardFooter>
                     {erro && (
                         <Alert variant="destructive">
                             <AlertCircle className="h-4 w-4"/>
