@@ -104,6 +104,7 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
                     .then(
                         (result) => {
                             if (result.status === 201) {
+                                console.log(result)
                                 modalMessage('Paciente cadastrado com sucesso')
                                 onClose()
                             } else {

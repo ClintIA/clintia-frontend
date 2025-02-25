@@ -38,7 +38,7 @@ export interface BookingWithPatient {
     patientData: DadosPaciente,
     examId: number
     userId: number
-    doctorId: number,
+    doctorId?: number,
     examDate?: string
 }
 interface BookingModalProps {
@@ -65,7 +65,6 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
     const [patientData, setPatientData] = useState<DadosPaciente>()
     const [selectedCanal, setSelectedCanal] = useState<string | undefined>('')
     const [selectedChannelContact, setSelectedChannelContact] = useState<string | undefined>('')
-
     const [isNewPatient, setIsNewPatient] = useState<boolean>(false)
     const auth = useAuth()
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -244,12 +243,19 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                            patientData: {...patientData, dob: createDate(patientData.dob)},
                            examId: parseInt(selectedExame),
                            userId: auth.userId,
-                           doctorId: parseInt(selectedDoctor),
+                           doctorId: parseInt(selectedDoctor) || undefined,
                            examDate: createDate(dadosBooking.examDate),
 
                        }
                       await submitBookingWithPatient(bookingWithPatient, auth.tenantId)
-                          .then(() => setStep(3))
+                          .then(() => {
+                              console.log('Booking with New Patient', bookingWithPatient)
+                              setStep(3)
+                              toast({
+                                  title:'Clintia',
+                                  description: 'Agendamento Realizado com sucesso'
+                              })
+                          })
                            .catch((error) =>  {
                                if(isAxiosError(error)) {
                                    setErro('Erro ao Cadastrar Paciente')
@@ -271,6 +277,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                        patientData.contactChannel = selectedChannelContact
 
                        const result = await submitBooking(bookingDados,auth.tenantId, patientData)
+                       console.log('Save booking', bookingDados)
+                       console.log('result', result)
                        if(result.status !== 201) {
                            setErro('Erro ao salvar paciente, verifique os dados')
                            toast({
@@ -280,6 +288,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
 
                        }
                        if(result.status === 201 && handleModalMessage) {
+                           console.log('Redirect to modal confirmation')
                            handleModalMessage(ModalType.bookingConfirmation)
                            setStep(3)
                        }
