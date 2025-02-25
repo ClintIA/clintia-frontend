@@ -30,6 +30,8 @@ export interface DadosPaciente {
     role?: string
     sessionToken?: string
     created_at?: string
+    contactChannel?: string;
+    indication_name?: string;
     health_card_number?: string
     tenants?: any[]
 }

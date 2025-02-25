@@ -17,7 +17,7 @@ export interface IExam {
     exam_name: string
     price: string
     exam_type?: string
-    doctorPrice?: string
+    doctorPrice?: string | number
     doctors?: number[]
     createdAt?: Date
 }
