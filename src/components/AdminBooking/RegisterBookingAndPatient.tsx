@@ -15,7 +15,7 @@ import { validarTelefone} from "@/lib/utils.ts";
 import { getPatientByPhoneAndTenant} from "@/services/patientService.tsx";
 import {ModalType} from "@/types/ModalType.ts";
 import {Spinner} from "@/components/ui/Spinner.tsx";
-import {genderOptions} from "@/lib/optionsFixed.ts";
+import {contactChannel, genderOptions} from "@/lib/optionsFixed.ts";
 import {isAxiosError} from "axios";
 import {DadosBooking} from "@/components/AdminBooking/RegisterBooking.tsx";
 import {listCanalMarketing} from "@/services/marketingService.ts";
@@ -64,6 +64,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
     const [showForm, setShowForm] = useState<boolean>(false)
     const [patientData, setPatientData] = useState<DadosPaciente>()
     const [selectedCanal, setSelectedCanal] = useState<string | undefined>('')
+    const [selectedChannelContact, setSelectedChannelContact] = useState<string | undefined>('')
+
     const [isNewPatient, setIsNewPatient] = useState<boolean>(false)
     const auth = useAuth()
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,6 +85,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
             cep:'',
             gender: '',
             health_card_number: '',
+            contactChannel: '',
+            indication_name: ''
         })
         setNotFoundPhone(false)
         setShowForm(false)
@@ -159,10 +163,6 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
     }, [exames, selectedExame, auth.tenantId]);
 
 
-    const handleInputCpf = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPhone(e.target.value)
-    }
-
     const handlePhoneCheck = async (e: React.FormEvent) => {
         e.preventDefault()
         setErro(null)
@@ -193,6 +193,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                     return
                 } else {
                     setSelectedCanal(data.canal)
+                    setSelectedChannelContact(data.contactChannel)
                     setPatientData(data)
                     setShowForm(true)
                     setNotFoundPhone(true)
@@ -237,6 +238,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                    if(patientData) {
                        patientData.phone = phone
                        patientData.canal = selectedCanal
+                       patientData.contactChannel = selectedChannelContact
 
                        const bookingWithPatient: BookingWithPatient = {
                            patientData: {...patientData, dob: createDate(patientData.dob)},
@@ -266,6 +268,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                    if (submitBooking && patientData) {
                        patientData.phone = phone
                        patientData.canal = selectedCanal
+                       patientData.contactChannel = selectedChannelContact
 
                        const result = await submitBooking(bookingDados,auth.tenantId, patientData)
                        if(result.status !== 201) {
@@ -314,7 +317,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
         try {
             if (auth.tenantId) {
 
-                const response = await registerPatient({...patientData, phone: phone, canal: selectedCanal}, auth.tenantId);
+                const response = await registerPatient({...patientData, phone: phone, contactChannel: selectedChannelContact, canal: selectedCanal}, auth.tenantId);
     
                 if (response.status === 201) {
                     toast({
@@ -341,231 +344,232 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
     
 
     return (
-        <div className="mt-6">
-
-            <Card className="w-full max-w-2xl mx-auto">
+        <div className="w-full mx-auto mt-10">
+            <Card className="w-full">
                 <CardHeader>
-                    <CardTitle className='text-xl text-oxfordBlue'>{title}</CardTitle>
-                    <CardDescription>
-                        Preencha os detalhes do paciente abaixo. Clique em salvar para continuar.
-                    </CardDescription>
+                    <CardTitle className="text-xl text-oxfordBlue">{title}</CardTitle>
+                    <CardDescription>Preencha os detalhes do paciente abaixo. Clique em salvar para
+                        continuar.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit}>
-                        <div className="grid gap-4">
-                            <div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="cpf" className="text-right text-oxfordBlue">
-                                        Telefone
-                                    </Label>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="col-span-4 space-y-2">
+                                <Label htmlFor="phone" className="text-oxfordBlue">
+                                    Telefone
+                                </Label>
+                                <div className="flex items-center gap-2">
                                     <Input
                                         id="phone"
                                         name="phone"
-                                        placeholder="Insira o telefone do paciente com DDD"
+                                        placeholder="Telefone com DDD"
                                         value={phone}
-                                        onChange={handleInputCpf}
-                                        className="col-span-3"
-                                       disabled={notFoundPhone}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        disabled={notFoundPhone}
+                                        className="flex-grow"
                                     />
+                                    {showForm ? (
+                                        <Button className="bg-oxfordBlue text-white" onClick={clearCpf}>
+                                            Limpar
+                                        </Button>
+                                    ) : (
+                                        <Button className="bg-oxfordBlue text-white" onClick={handlePhoneCheck}>
+                                            Verificar
+                                        </Button>
+                                    )}
                                 </div>
-                                {showForm ? (
-                                    <div className="flex justify-end mt-1">
-                                        <Button className="bg-oxfordBlue text-white"
-                                                onClick={clearCpf}>Limpar</Button>
-                                    </div>
-                                ) : (
-                                    <div className="flex justify-end mt-1">
-                                        <Button className="bg-oxfordBlue text-white"
-                                                onClick={handlePhoneCheck}>Verificar</Button>
-                                    </div>
-                                )
-                                }
                             </div>
-                            <div className={showForm ? 'grid gap-2' : 'hidden'}>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="full_name" className="text-right text-oxfordBlue">
-                                        Nome
-                                    </Label>
-                                    <Input
-                                        id="full_name"
-                                        name="full_name"
-                                        value={patientData?.full_name}
-                                        className="col-span-3"
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="phone" className="text-right text-oxfordBlue">
-                                        CPF
-                                    </Label>
-                                    <Input
-                                        id="cpf"
-                                        name="cpf"
-                                        value={patientData?.cpf}
-                                        onChange={handleInputChange}
-                                        className="col-span-3"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="email" className="text-right text-oxfordBlue">
-                                        Email
-                                    </Label>
-                                    <Input
-                                        id="email"
-                                        name="email"
-                                        value={patientData?.email}
-                                        className="col-span-3"
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="health_card_number" className="text-right text-oxfordBlue">
-                                        Plano de Saúde
-                                    </Label>
-                                    <Input
-                                        id="health_card_number"
-                                        name="health_card_number"
-                                        type="tel"
-                                        onChange={handleInputChange}
-                                        value={patientData?.health_card_number}
-                                        className="col-span-3"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="dob" className="text-right text-oxfordBlue">
-                                        Data de Nascimento
-                                    </Label>
-                                    <Input
-                                        id="dob"
-                                        name="dob"
-                                        type="date"
-                                        value={patientData?.dob}
-                                        onChange={handleInputChange}
-                                        className="col-span-3"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="cep" className="text-right text-oxfordBlue">
-                                        CEP
-                                    </Label>
-                                    <Input
-                                        id="cep"
-                                        name="cep"
-                                        type="text"
-                                        value={patientData?.cep}
-                                        onChange={handleInputChange}
-                                        className="col-span-3"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="cep" className="text-right text-oxfordBlue">
-                                        Diagnóstico
-                                    </Label>
-                                    <Input
-                                        id="diagnostic"
-                                        name="diagnostic"
-                                        type="text"
-                                        value={patientData?.diagnostic}
-                                        onChange={handleInputChange}
-                                        className="col-span-3 h-16"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="gender" className="text-right text-oxfordBlue">
-                                        Genero
-                                    </Label>
-                                    <div className="flex flex-row gap-2">
-                                        {genderOptions.map((option) => (
 
-                                            <label
-                                                key={option.value}
-                                                className="flex items-center space-x-3 cursor-pointer"
-                                            >
-                                                <input
-                                                    type="radio"
-                                                    name="gender"
-                                                    value={option.value}
-                                                    checked={patientData?.gender === option.value}
-                                                    onChange={handleInputChange}
-                                                    className="form-radio h-4 w-4 text-oxfordBlue focus:ring-blue-800 border-gray-300"
-                                                />
-                                                <span
-                                                    className="w-max text-sm text-oxfordBlue">{option.label}</span>
-                                            </label>
-                                        ))}
+                            {showForm && (
+                                <>
+                                    <div className="col-span-2 space-y-2">
+                                        <Label htmlFor="full_name" className="text-oxfordBlue">
+                                            Nome
+                                        </Label>
+                                        <Input
+                                            id="full_name"
+                                            name="full_name"
+                                            value={patientData?.full_name}
+                                            onChange={handleInputChange}
+                                        />
                                     </div>
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label className="text-right text-oxfordBlue" htmlFor="examId">Selecione o
-                                        Canal de Captação</Label>
-                                    <Select value={selectedCanal} onValueChange={setSelectedCanal}>
-                                        <SelectTrigger className="col-span-3" id="canal">
-                                            <SelectValue placeholder="Selecione o Canal de Captação"/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {canal.map((canal) => (
-                                                <SelectItem key={canal.id} value={canal.id ? canal.id.toString() : ''}>
-                                                    {canal.canal}
-                                                </SelectItem>
+                                    <div className="col-span-2 space-y-2">
+                                        <Label htmlFor="cpf" className="text-oxfordBlue">
+                                            CPF
+                                        </Label>
+                                        <Input id="cpf" name="cpf" value={patientData?.cpf}
+                                               onChange={handleInputChange}/>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email" className="text-oxfordBlue">
+                                            Email
+                                        </Label>
+                                        <Input id="email" name="email" value={patientData?.email}
+                                               onChange={handleInputChange}/>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="health_card_number" className="text-oxfordBlue">
+                                            Plano de Saúde
+                                        </Label>
+                                        <Input
+                                            id="health_card_number"
+                                            name="health_card_number"
+                                            type="tel"
+                                            value={patientData?.health_card_number}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="dob" className="text-oxfordBlue">
+                                            Data de Nascimento
+                                        </Label>
+                                        <Input id="dob" name="dob" type="date" value={patientData?.dob}
+                                               onChange={handleInputChange}/>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="cep" className="text-oxfordBlue">
+                                            CEP
+                                        </Label>
+                                        <Input id="cep" name="cep" type="text" value={patientData?.cep}
+                                               onChange={handleInputChange}/>
+                                    </div>
+                                    <div className=" space-y-2">
+                                        <Label htmlFor="contactChannel" className="text-oxfordBlue">
+                                            Canal de Contato
+                                        </Label>
+                                        <Select value={selectedChannelContact} onValueChange={setSelectedChannelContact}>
+                                            <SelectTrigger id="contactChannel">
+                                                <SelectValue placeholder="Canal de Contato"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {contactChannel.map((c) => (
+                                                    <SelectItem key={c.value} value={c.value}>
+                                                        {c.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className=" space-y-2">
+                                        <Label htmlFor="canal" className="text-oxfordBlue">
+                                            Canal de Captação
+                                        </Label>
+                                        <Select value={selectedCanal} onValueChange={setSelectedCanal}>
+                                            <SelectTrigger id="canal">
+                                                <SelectValue placeholder="Canal de Captação"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {canal.map((c) => (
+                                                    <SelectItem key={c.id} value={c.id ? c.id.toString() : ""}>
+                                                        {c.canal}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    {canal.map((item) => {
+                                            if (selectedCanal == item.id && item.canal == "Indicação Médica") {
+                                                return (
+                                                    <div className="space-y-2">
+                                                        <Label htmlFor="indication_name" className="text-oxfordBlue">
+                                                            Nome
+                                                        </Label>
+                                                        <Input id="cep" name="indication_name" type="text" value={patientData?.indication_name}
+                                                               onChange={handleInputChange}/>
+                                                    </div>
+                                                )
+                                            }
+                                        }
+                                    )}
+                                    <div className="col-span-4 space-y-2">
+                                        <Label htmlFor="gender" className="text-oxfordBlue">
+                                            Gênero
+                                        </Label>
+                                        <div className="flex flex-row gap-4">
+                                            {genderOptions.map((option) => (
+                                                <label key={option.value}
+                                                       className="flex items-center space-x-2 cursor-pointer">
+                                                    <input
+                                                        type="radio"
+                                                        name="gender"
+                                                        value={option.value}
+                                                        checked={patientData?.gender === option.value}
+                                                        onChange={handleInputChange}
+                                                        className="form-radio h-4 w-4 text-oxfordBlue focus:ring-blue-800 border-gray-300"
+                                                    />
+                                                    <span className="text-sm text-oxfordBlue">{option.label}</span>
+                                                </label>
                                             ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right text-oxfordBlue" htmlFor="examId">Selecione o Exame</Label>
-                                <Select disabled={!patientData} value={selectedExame} onValueChange={setSelectedExame}>
-                                    <SelectTrigger className="col-span-3" id="examId">
-                                        <SelectValue placeholder="Selecione o Exame"/>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {exames.map((exam) => (
-                                            <SelectItem key={exam.id} value={exam.id.toString()}>
-                                                {exam.exam_name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="doctor" className="text-right text-oxfordBlue">
-                                Selecione o Profissional
-                            </Label>
-                            {isLoading  ? (
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Spinner size={16} className="text-muted-foreground" />
-                                </div>
-                            ) : (
-                                <Select disabled={!patientData} value={selectedDoctor} onValueChange={setSelectedDoctor}>
-                                    <SelectTrigger className="col-span-3" id="doctor">
-                                        <SelectValue placeholder="Selecione o Profissional"/>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {doctors?.map((doctor) => (
-                                            <SelectItem key={doctor.id} value={doctor.id.toString()}>
-                                                {doctor.fullName}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                        </div>
+                                    </div>
+                                    <div className="col-span-4 space-y-2">
+                                        <Label htmlFor="diagnostic" className="text-oxfordBlue">
+                                            Diagnóstico
+                                        </Label>
+                                        <Input
+                                            id="diagnostic"
+                                            name="diagnostic"
+                                            type="text"
+                                            value={patientData?.diagnostic}
+                                            onChange={handleInputChange}
+                                            className="h-16"
+                                        />
+                                    </div>
+                                    <div className=" space-y-2">
+                                        <Label htmlFor="examId" className="text-oxfordBlue">
+                                            Exame
+                                        </Label>
+                                        <Select disabled={!patientData} value={selectedExame}
+                                                onValueChange={setSelectedExame}>
+                                            <SelectTrigger id="examId">
+                                                <SelectValue placeholder="Selecione o Exame"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {exames.map((exam) => (
+                                                    <SelectItem key={exam.id} value={exam.id.toString()}>
+                                                        {exam.exam_name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className=" space-y-2">
+                                        <Label htmlFor="doctor" className="text-oxfordBlue">
+                                            Profissional
+                                        </Label>
+                                        {isLoading ? (
+                                            <div className="flex items-center justify-center h-10">
+                                                <Spinner size={16} className="text-muted-foreground"/>
+                                            </div>
+                                        ) : (
+                                            <Select disabled={!patientData} value={selectedDoctor}
+                                                    onValueChange={setSelectedDoctor}>
+                                                <SelectTrigger id="doctor">
+                                                    <SelectValue placeholder="Selecione o Profissional"/>
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {doctors?.map((doctor) => (
+                                                        <SelectItem key={doctor.id} value={doctor.id.toString()}>
+                                                            {doctor.fullName}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        )}
+                                    </div>
+                                    <div className=" space-y-2">
+                                        <Label htmlFor="examDate" className="text-oxfordBlue">
+                                            Dia do Exame
+                                        </Label>
+                                        <Input id="examDate" name="examDate" type="datetime-local"
+                                               onChange={handleInputBookingChange}/>
+                                    </div>
+                                </>
                             )}
                         </div>
-
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="examDate" className="text-right text-oxfordBlue00">
-                                    Dia do Exame
-                                </Label>
-                                <Input
-                                    id="examDate"
-                                    name="examDate"
-                                    type="datetime-local"
-                                    onChange={handleInputBookingChange}
-                                    className="col-span-3"
-                                />
-                            </div>
-                        </div>
-                        <div className="flex justify-between mt-12 gap-4">
-                            <Button className="bg-oxfordBlue text-white w-70" type="button" onClick={handleRegisterLead}>
+                        <div className="flex justify-between mt-8 gap-4">
+                            <Button className="bg-oxfordBlue text-white w-70" type="button"
+                                    onClick={handleRegisterLead}>
                                 Registrar Contato
                             </Button>
                             <Button disabled={!selectedExame} className="bg-oxfordBlue text-white w-70" type="submit">
@@ -586,7 +590,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
             </Card>
         </div>
 
-)
+    )
 }
 
 export default RegisterBookingAndPatient;

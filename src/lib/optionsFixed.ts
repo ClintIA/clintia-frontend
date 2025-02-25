@@ -15,6 +15,10 @@ export const roleOptions = [
     { value: 'doctor', label: 'Profissional da Saúde', disable: true },
     { value: 'patient', label: 'Paciente', disable: true }
 ];
+export const contactChannel = [
+    { value: 'whatsapp', label: 'WhatsApp', disable: false},
+    { value: 'phone', label: 'Telefone', disable: false },
+];
 export const findRoleOptions = (canal?: string) => {
     if(canal) {
         let role;

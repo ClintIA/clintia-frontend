@@ -46,7 +46,9 @@ export const validarDataNascimento = (data: string) => {
 }
 export const createDate = (date: string) => {
   const dateArray = date.split('/')
-  return dateArray[2] + "-" + dateArray[0] + "-" + dateArray[1]
+  const month = (parseInt(dateArray[0]) < 10) ? "0"+dateArray[0] : dateArray[0]
+
+  return dateArray[2] + "-" + month + "-" + dateArray[1]
 }
 export const formatDate = (date: string) => {
   const dateArray = date.split('-')

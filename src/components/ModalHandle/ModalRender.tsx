@@ -170,7 +170,7 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
     }
     const submitUpdateExam = async (examData: IExam, tenantId: number) => {
         if (modalMessage) {
-            await updateExam(examData, tenantId)
+            await updateExam({...examData, doctorPrice: Number(examData.doctorPrice)}, tenantId)
                 .then((result) => {
                     if (result.data.status === "success") {
                         modalMessage('Procedimento Atualizado com sucesso')

@@ -9,7 +9,7 @@
 
 .content {
     min-width: 50%; /* Reduz a largura mínima */
-    max-width: 500px; /* Limita a largura máxima */
+    max-width: 1000px; /* Limita a largura máxima */
     max-height: 90vh; /* Garante que o modal não ultrapasse a altura da viewport */
     border-radius: 6px;
     padding: 2rem; /* Ajuste para telas pequenas */

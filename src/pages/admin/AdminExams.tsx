@@ -12,6 +12,8 @@ import {IPatientExam} from "@/pages/admin/AdminHome.tsx";
 import Cards from "@/components/Card.tsx";
 import DataTable from "@/components/DataTable.tsx";
 import NoDataTable from "@/components/NoDataTable.tsx";
+import {format} from "date-fns";
+import {ptBR} from "date-fns/locale";
 
 
 
@@ -123,8 +125,8 @@ const AdminExams: React.FC = () =>  {
       <>
         <TableCell className="text-oxfordBlue font-bold">{exam?.patient?.full_name}</TableCell>
         <TableCell className="text-oxfordBlue00">{exam?.exam?.exam_name}</TableCell>
-        <TableCell className="text-oxfordBlue00">{new Date(exam?.createdAt).toLocaleDateString()}</TableCell>
-        <TableCell className="text-oxfordBlue00">{new Date(exam?.examDate).toLocaleDateString()}</TableCell>
+        <TableCell className="text-oxfordBlue00">{exam.createdAt ? format(exam.createdAt, "dd/MM/yyyy", { locale: ptBR }) : ''}</TableCell>
+        <TableCell className="text-oxfordBlue00">{exam.examDate ? format(exam.examDate, "dd/MM/yyyy", { locale: ptBR }) : ''}</TableCell>
         <TableCell className="text-oxfordBlue00">{translateStatus(exam?.status)}</TableCell>
         <TableCell>
           <Button
