@@ -468,7 +468,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                         </Select>
                                     </div>
                                     {canal.map((item) => {
-                                            if (selectedCanal == item.id && item.canal == "Indicação Médica") {
+                                            if (selectedCanal == item.id && item.canal == "Indicação") {
                                                 return (
                                                     <div className="space-y-2">
                                                         <Label htmlFor="indication_name" className="text-oxfordBlue">
@@ -567,7 +567,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                 </>
                             )}
                         </div>
-                        <div className="flex justify-between mt-8 gap-4">
+                        { showForm && (<div className="flex justify-between mt-8 gap-4">
                             <Button className="bg-oxfordBlue text-white w-70" type="button"
                                     onClick={handleRegisterLead}>
                                 Registrar Contato
@@ -575,10 +575,10 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                             <Button disabled={!selectedExame} className="bg-oxfordBlue text-white w-70" type="submit">
                                 Salvar Agendamento
                             </Button>
-                        </div>
+                        </div>)}
                     </form>
                 </CardContent>
-                <CardFooter>
+                <CardFooter
                     {erro && (
                         <Alert variant="destructive">
                             <AlertCircle className="h-4 w-4"/>
