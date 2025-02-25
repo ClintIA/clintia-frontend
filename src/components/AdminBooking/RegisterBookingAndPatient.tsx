@@ -249,7 +249,6 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                        }
                       await submitBookingWithPatient(bookingWithPatient, auth.tenantId)
                           .then(() => {
-                              console.log('Booking with New Patient', bookingWithPatient)
                               setStep(3)
                               toast({
                                   title:'Clintia',
@@ -268,7 +267,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                const bookingDados = {
                    ...dadosBooking,
                    examDate: createDate(dadosBooking.examDate),
-                   doctor: doctorSelected
+                   doctor: doctorSelected,
+                   doctorId: parseInt(selectedDoctor) || undefined
                }
                try {
                    if (submitBooking && patientData) {
@@ -277,8 +277,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                        patientData.contactChannel = selectedChannelContact
 
                        const result = await submitBooking(bookingDados,auth.tenantId, patientData)
-                       console.log('Save booking', bookingDados)
-                       console.log('result', result)
+
                        if(result.status !== 201) {
                            setErro('Erro ao salvar paciente, verifique os dados')
                            toast({
@@ -288,7 +287,6 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
 
                        }
                        if(result.status === 201 && handleModalMessage) {
-                           console.log('Redirect to modal confirmation')
                            handleModalMessage(ModalType.bookingConfirmation)
                            setStep(3)
                        }
