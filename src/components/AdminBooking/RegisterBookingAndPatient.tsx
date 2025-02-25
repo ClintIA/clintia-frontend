@@ -16,7 +16,6 @@ import { getPatientByPhoneAndTenant} from "@/services/patientService.tsx";
 import {ModalType} from "@/types/ModalType.ts";
 import {Spinner} from "@/components/ui/Spinner.tsx";
 import {contactChannel, genderOptions} from "@/lib/optionsFixed.ts";
-import {isAxiosError} from "axios";
 import {DadosBooking} from "@/components/AdminBooking/RegisterBooking.tsx";
 import {listCanalMarketing} from "@/services/marketingService.ts";
 import {toast} from "@/hooks/use-toast.ts";
@@ -247,20 +246,11 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                            examDate: createDate(dadosBooking.examDate),
 
                        }
-                      await submitBookingWithPatient(bookingWithPatient, auth.tenantId)
-                          .then(() => {
-                              setStep(3)
-                              toast({
-                                  title:'Clintia',
-                                  description: 'Agendamento Realizado com sucesso'
-                              })
-                          })
-                           .catch((error) =>  {
-                               if(isAxiosError(error)) {
-                                   setErro('Erro ao Cadastrar Paciente')
-                               }
-                               console.log(error)
-                           })
+                      const result = await submitBookingWithPatient(bookingWithPatient, auth.tenantId)
+                       if(result.status === 201 && handleModalMessage) {
+                           handleModalMessage(ModalType.bookingConfirmation)
+                           setStep(3)
+                       }
                        return
                    }
                }
@@ -277,7 +267,6 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                        patientData.contactChannel = selectedChannelContact
 
                        const result = await submitBooking(bookingDados,auth.tenantId, patientData)
-
                        if(result.status !== 201) {
                            setErro('Erro ao salvar paciente, verifique os dados')
                            toast({
