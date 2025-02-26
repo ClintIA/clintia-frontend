@@ -102,7 +102,6 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
         setErro(null)
 
         if (!doctorData.fullName ||
-            !doctorData.cep ||
             !doctorData.occupation ||
             !doctorData.CRM ||
             !doctorData.phone ||
