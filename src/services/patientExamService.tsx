@@ -84,3 +84,17 @@ export const confirmPatientExam = async (tenantId: number, examId: number, prese
         }
     }
 }
+
+export const deletePatientExam = async (tenantId: number, patientExamId: number) => {
+    try {
+        return await apiClient.put(`admin/patientexams/${patientExamId}`, {
+            headers: {
+                'x-tenant-id': tenantId
+            }
+        })
+    } catch (error) {
+        if(isAxiosError(error)) {
+            return error.response?.data
+        }
+    }
+}
