@@ -21,12 +21,11 @@ export interface BookingConfirmationState {
 }
 const BookingConfirmation: React.FC<BookingConfirmationProps> = ({ dadosBooking, onNewBooking, setStep}: BookingConfirmationProps) => {
 
-
     const newBooking = () => {
         if (onNewBooking) {
-            onNewBooking(ModalType.newBookingPatient);
             setStep(0)
         }
+        location.reload()
     }
     const createDate = (date: string) => {
         const dateArray = date.split('-')

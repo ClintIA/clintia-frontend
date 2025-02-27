@@ -506,7 +506,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                         </Select>
                                     </div>
                                     {canal.map((item) => {
-                                            if (selectedCanal == item.id && item.canal == "Indicação") {
+                                            if ((selectedCanal == item.id) && (item.canal == "Indicação" || item.canal == "Outros")) {
                                                 return (
                                                     <div className="space-y-2">
                                                         <Label htmlFor="indication_name" className="text-oxfordBlue">
