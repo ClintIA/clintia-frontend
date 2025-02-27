@@ -17,7 +17,21 @@ export const listLeadsByTenant = async (tenantId: number) => {
         }
     }
 }
+export const createRegisterLead = async (leadRegister: CreateLeadDTO, tenantId:  number) => {
 
+    try {
+        return await apiClient.post('/admin/leads', leadRegister , {
+            headers: {
+                'x-tenant-id': tenantId
+            }
+        })
+
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return error.response?.data
+        }
+    }
+}
 export const updateLead = async (leadData: CreateLeadDTO, tenantId: number) => {
     try {
         return await apiClient.put(`admin/leads/${leadData.id}`,leadData,{

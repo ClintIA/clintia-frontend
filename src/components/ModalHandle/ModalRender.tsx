@@ -5,7 +5,7 @@ import RegisterBooking, {DadosBooking} from "@/components/AdminBooking/RegisterB
 import ModalFlexivel from "@/components/ModalHandle/ModalFlexivel.tsx";
 import { registerPatientExam} from "@/services/patientExamService.tsx";
 import {updatePatient} from "@/services/patientService.tsx";
-import RegisterBookingAndPatient from "@/components/AdminBooking/RegisterBookingAndPatient.tsx";
+import RegisterBookingAndPatient, {ExamesSelect} from "@/components/AdminBooking/RegisterBookingAndPatient.tsx";
 import BookingConfirmation, {BookingConfirmationState} from "@/components/AdminBooking/BookingConfirmation.tsx";
 import {ModalType} from "@/types/ModalType.ts";
 import {registerAdmin, updateAdmin} from "@/services/adminsService.tsx";
@@ -15,8 +15,9 @@ import {IAdmin} from "@/types/dto/Admin.ts";
 import {registerDoctor, updateDoctor} from "@/services/doctorService.ts";
 import {createExam, updateExam} from "@/services/tenantExamService.tsx";
 import RegisterTenantExam, {IExam} from "@/components/AdminTenantExam/RegisterTenantExam.tsx";
-import {Exams} from "@/pages/admin/AdminTenantExams.tsx";
 import {IMarketing} from "@/types/Marketing.ts";
+import AdminLead from "@/components/AdminLead/AdminLead.tsx";
+import {Exams} from "@/pages/admin/AdminTenantExams.tsx";
 
 
 interface ModalRegisterProps {
@@ -39,7 +40,7 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
     const [modalContent,setModalContent] = useState<ModalType>(ModalType.newPatient)
     const [patientData, setPatientData] = useState<BookingConfirmationState>({} as BookingConfirmationState)
     const [currentStep, setCurrentStep] = useState(0)
-
+    const [exames, setExames] = useState<ExamesSelect[]>([])
     const setStep = (step: number) => {
         setCurrentStep(step)
     }
@@ -47,9 +48,12 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
         openModal(type)
     }, [type])
 
-    const openModal = (type: ModalType, patientData?: BookingConfirmationState) => {
+    const openModal = (type: ModalType, exam?: ExamesSelect[], patientData?: BookingConfirmationState) => {
         if(patientData) {
             setPatientData(patientData)
+        }
+        if(exam) {
+            setExames(exam)
         }
         setModalContent(type)
         setOpen(true)
@@ -197,6 +201,8 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
                 return (<RegisterTenantExam title={title} isUpdate={submitUpdateExam} dadosIniciais={data} />)
             case 'newExam':
                 return(<RegisterTenantExam title={title} isNewExam={submitNewExam}/>)
+            case 'newLead':
+                return(<AdminLead exams={exames} title={title}/>)
         }
     }
     return (

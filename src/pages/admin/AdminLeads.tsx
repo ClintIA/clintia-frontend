@@ -43,7 +43,7 @@ const AdminLeads: React.FC = () => {
                 const result = await listLeadsByTenant(auth.tenantId)
                 if(result?.data.data) {
                     setLoading(false);
-                    setPacientes(result?.data.data)
+                    setPacientes(result?.data.data.leads)
                 } else {
                     setLoading(false);
                     setPacientes([])
@@ -85,12 +85,12 @@ const AdminLeads: React.FC = () => {
 
     const renderRow = (lead: CreateLeadDTO) => (
         <>
-            <TableCell className="text-oxfordBlue font-bold">{lead.name}</TableCell>
-            <TableCell className="text-oxfordBlue">{lead.phoneNumber}</TableCell>
-            <TableCell className="text-oxfordBlue">{lead.canal}</TableCell>
-            <TableCell className="text-oxfordBlue">{lead.contactChannel}</TableCell>
-            <TableCell className="text-oxfordBlue">{lead.scheduled}</TableCell>
-            <TableCell className="text-oxfordBlue">{formatDate(lead.scheduledDate)}</TableCell>
+            <TableCell className="text-oxfordBlue font-bold">{lead.name || 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue">{lead.phoneNumber || 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue">{lead.canal || 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue">{lead.contactChannel || 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue">{lead.scheduled || 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue">{formatDate(lead.scheduledDate) || 'Sem Registro'}</TableCell>
         </>
     );
     const handleDeletePatient = async () => {

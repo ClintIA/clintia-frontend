@@ -20,12 +20,11 @@ import {DadosBooking} from "@/components/AdminBooking/RegisterBooking.tsx";
 import {listCanalMarketing} from "@/services/marketingService.ts";
 import {toast} from "@/hooks/use-toast.ts";
 import {IMarketing} from "@/types/Marketing.ts";
-import {registerPatient} from "@/services/loginService.tsx";
 import {LoadingBar} from "@/components/LoadingBar.tsx";
 import {registerBookingWithPatient, registerPatientExam} from "@/services/patientExamService.tsx";
 import {BookingConfirmationState} from "@/components/AdminBooking/BookingConfirmation.tsx";
 
-export interface Exams {
+export interface ExamesSelect {
     id: number
     exam_name: string
     price: string
@@ -44,7 +43,7 @@ export interface BookingWithPatient {
     examDate?: string
 }
 interface BookingModalProps {
-    handleModalMessage?: (type: ModalType, patientData: BookingConfirmationState) => void
+    handleModalMessage?: (type: ModalType, exame?: ExamesSelect[], patientData?: BookingConfirmationState) => void
     setStep: (step: number) => void
     title: string
 }
@@ -54,7 +53,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
     const [canal, setCanal] = useState<IMarketing[]>([])
     const [selectedExame, setSelectedExame] = useState<string>('')
     const [selectedDoctor, setSelectedDoctor] = useState<string>('')
-    const [exames, setExames] = useState<Exams[]>([])
+    const [exames, setExames] = useState<ExamesSelect[]>([])
     const [phone, setPhone] = useState<string>('')
     const [erro, setErro] = useState<string | null>(null)
     const [doctors, setDoctors] = useState<Doctor[] | undefined>(undefined)
@@ -275,10 +274,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
 
                        }
                       const result = await submitBookintWithPatient(bookingWithPatient, auth.tenantId)
-                       console.log('submitWith', result)
-
                        if(result.status === 201 && handleModalMessage) {
-                           handleModalMessage(ModalType.bookingConfirmation, result?.data.data.data)
+                           handleModalMessage(ModalType.bookingConfirmation, undefined,result?.data.data.data)
                            setStep(3)
                        }
                        return
@@ -297,7 +294,6 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                        patientData.contactChannel = selectedChannelContact
 
                        const result = await submitBookingExam(bookingDados,auth.tenantId, patientData)
-                       console.log('submit', result)
                        if(result.status !== 201) {
                            setErro('Erro ao salvar paciente, verifique os dados')
                            toast({
@@ -307,7 +303,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
 
                        }
                        if(result.status === 201 && handleModalMessage) {
-                           handleModalMessage(ModalType.bookingConfirmation, result?.data.data.data)
+                           handleModalMessage(ModalType.bookingConfirmation,undefined, result?.data.data.data)
                            setStep(3)
                        }
                    }
@@ -338,37 +334,11 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
     const handleRegisterLead = async () => {
         setErro(null);
 
-        if (!patientData?.full_name || !phone || !selectedCanal) {
-            setErro('Preencha pelo menos Nome, Telefone e Canal antes de registrar o contato.');
-            return;
+        if(handleModalMessage) {
+            handleModalMessage(ModalType.newLead,exames)
         }
-    
-        try {
-            if (auth.tenantId) {
-
-                const response = await registerPatient({...patientData, phone: phone, contactChannel: selectedChannelContact, canal: selectedCanal}, auth.tenantId);
-    
-                if (response.status === 201) {
-                    toast({
-                        title: 'Sucesso!',
-                        description: 'Contato registrado com sucesso.',
-                    });
-                    setPhone('');
-                    setSelectedCanal('');
-                    setPatientData({} as DadosPaciente );
-                    setTimeout(() => {
-                        location.reload();
-                    },2000);
 
 
-                } else {
-                    setErro('Erro ao registrar contato.');
-                }
-            }
-        } catch (error) {
-            console.error(error);
-            setErro('Falha ao registrar o contato.');
-        }
     };
     
 
