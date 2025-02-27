@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 export const apiClient = axios.create({
-    baseURL: import.meta.env.VITE,
+    baseURL: import.meta.env.VITE_BACKEND_URL,
 });
 
 apiClient.interceptors.request.use(
