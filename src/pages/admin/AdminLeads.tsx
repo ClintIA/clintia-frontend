@@ -41,7 +41,7 @@ const AdminLeads: React.FC = () => {
         try {
             if(auth.tenantId) {
                 const result = await listLeadsByTenant(auth.tenantId)
-                if(result?.data.data.length !== 0) {
+                if(result?.data.data) {
                     setLoading(false);
                     setPacientes(result?.data.data)
                 } else {

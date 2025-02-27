@@ -87,7 +87,7 @@ export const confirmPatientExam = async (tenantId: number, examId: number, prese
 
 export const deletePatientExam = async (tenantId: number, patientExamId: number) => {
     try {
-        return await apiClient.put(`admin/patientexams/${patientExamId}`, {
+        return await apiClient.delete(`admin/patientexams/${patientExamId}`, {
             headers: {
                 'x-tenant-id': tenantId
             }
