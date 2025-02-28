@@ -11,7 +11,7 @@ interface ListPatientExamsFilters {
     patientName?: string
 }
 
-export const registerPatientExam = async (dadosBooking: DadosBooking, tenantId: number) => {
+export const registerPatientExam = async (dadosBooking: DadosBooking, tenantId: number | undefined) => {
 
     try {
         return await apiClient.post('admin/patientExams', dadosBooking, {
@@ -74,6 +74,20 @@ export const confirmPatientExam = async (tenantId: number, examId: number, prese
         return await apiClient.put(`admin/patientexams/attendance/${examId}`, {
             attended: presence
         }, {
+            headers: {
+                'x-tenant-id': tenantId
+            }
+        })
+    } catch (error) {
+        if(isAxiosError(error)) {
+            return error.response?.data
+        }
+    }
+}
+
+export const deletePatientExam = async (tenantId: number, patientExamId: number) => {
+    try {
+        return await apiClient.delete(`admin/patientexams/${patientExamId}`, {
             headers: {
                 'x-tenant-id': tenantId
             }

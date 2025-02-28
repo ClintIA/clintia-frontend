@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/auth.tsx";
 import {
-  Activity,
+  Activity, BookUser,
   Calendar,
   ChevronDown,
   ChevronRight, CircleUser, Contact2,
@@ -114,6 +114,13 @@ const AdminSidebar: React.FC = () => {
                     >
                       <Users className="mr-2" size={12}/>
                       <span>Pacientes</span>
+                    </Link>
+                    <Link
+                        to="/admin/leads"
+                        className="flex items-center p-2 mt-2 mr-2 rounded-lg hover:bg-gray-700"
+                    >
+                      <BookUser className="mr-2" size={12}/>
+                      <span>Leads</span>
                     </Link>
                     {hasAccess(auth.role, 'admin') && (
                         <>

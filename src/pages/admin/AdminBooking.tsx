@@ -4,7 +4,7 @@ import {Tabs, TabsContent} from "@/components/ui/tabs.tsx"
 import {DadosPaciente} from "@/components/AdminPatient/RegisterPatient.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import ModalRender from "@/components/ModalHandle/ModalRender.tsx";
-import {confirmPatientExam, listPatientExams} from "@/services/patientExamService.tsx";
+import {confirmPatientExam, deletePatientExam, listPatientExams} from "@/services/patientExamService.tsx";
 import {useAuth} from "@/hooks/auth.tsx";
 import {IPatientExam} from "@/pages/admin/AdminHome.tsx";
 import BookingList from "@/components/AdminBooking/BookingList.tsx";
@@ -111,6 +111,18 @@ const AdminBooking: React.FC = () =>  {
             console.log(error)
         }
     }
+
+    const handleDeleteBooking = async (patientExamId: number) => {
+        try {
+            await deletePatientExam(auth.tenantId!, patientExamId);
+            handleModalMessage('Agendamento deletado com sucesso.')
+            await fetchPatientExams(date)
+        } catch (error) {
+            console.error(error)
+            handleModalMessage('Erro ao deletar o agendamento.')
+        }
+    }
+
     return (
         <div className="w-full p-10 mx-auto">
             <h1 className="text-3xl mb-6 font-bold tracking-tight">Agendamentos</h1>
@@ -156,6 +168,7 @@ const AdminBooking: React.FC = () =>  {
                                                 <div className="ml-4">
                                                     <BookingList
                                                         onConfirmarPresenca={handlePresence}
+                                                        onDeleteBooking={handleDeleteBooking}
                                                         loading={loading}
                                                         agendamentos={exams}
                                                     />

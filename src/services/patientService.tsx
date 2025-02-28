@@ -58,7 +58,7 @@ export const listPatientsByTenant = async (tenantId: number, filters?: PatientFi
     }
 }
 
-export const updatePatient = async (patientData: DadosPaciente, tenantId: number) => {
+export const updatePatient = async (patientData: DadosPaciente, tenantId: number | undefined) => {
     try {
         return await apiClient.put(`admin/patient/${patientData.id}`,patientData,{
             headers: {
@@ -87,11 +87,10 @@ export const deletePatient = async (patientId: string, tenantId: number) => {
 
 export const patientExams = async(patientId: number): Promise<GetPatientExamsResponse | undefined> => {
     try{
-        const response = await apiClient.get(`/patientExams`, {
+        return await apiClient.get(`/patientExams`, {
             params: { patientId },
 
         });
-        return response.data;
 
     } catch (error) {
         if(isAxiosError(error)) {

@@ -20,6 +20,7 @@ import {PublicRoute} from "./PublicRoute/PublicRoute.tsx";
 import { AuthRedirect } from "./AuthRedirect/AuthRedirect.tsx";
 import AdminProfile from "@/pages/admin/AdminProfile.tsx";
 import AdminSelectTenant from "@/components/AdminSelectTenant/AdminSelectTenant.tsx";
+import AdminLeads from "@/pages/admin/AdminLeads.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -95,6 +96,10 @@ export const router = createBrowserRouter([
             {
                 path:'registrar-pacientes',
                 element:(<ProtectedRoute  role={ProfileRole.default}> <AdminPatient /> </ProtectedRoute>),
+            },
+            {
+                path:'leads',
+                element:(<ProtectedRoute  role={ProfileRole.default}> <AdminLeads /> </ProtectedRoute>),
             },
             {
                 path:'upload-exames',
