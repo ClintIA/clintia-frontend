@@ -1,10 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {Card, CardContent} from "@/components/ui/card.tsx"
-import {Input} from "@/components/ui/input.tsx"
-import {Label} from "@/components/ui/label.tsx"
 import {Table, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx"
 import Cards from "@/components/Card.tsx";
-import {deletePatient,} from "@/services/patientService.tsx";
 import {useAuth} from "@/hooks/auth.tsx";
 import {DadosPaciente} from "@/components/AdminPatient/RegisterPatient.tsx";
 import Loading from "@/components/Loading.tsx";
@@ -14,7 +11,7 @@ import GeneralModal from "@/components/ModalHandle/GeneralModal.tsx";
 import {TableCell} from "@mui/material";
 import {ModalType} from "@/types/ModalType.ts";
 import NoDataTable from "@/components/NoDataTable.tsx";
-import {listLeadsByTenant} from "@/services/leadService.tsx";
+import {deleteLead, listLeadsByTenant} from "@/services/leadService.tsx";
 import {CreateLeadDTO} from "@/types/dto/CreateLead.ts";
 import {listCanalMarketing} from "@/services/marketingService.ts";
 import {IMarketing} from "@/types/Marketing.ts";
@@ -32,8 +29,7 @@ const AdminLeads: React.FC = () => {
     const [isGeneralModalOpen, setIsGeneralModalOpen] = useState(false)
     const [deleteId, setDeleteId] = useState<number>()
     const [pacientes, setPacientes] = useState<DadosPaciente[]>([])
-    const [filtroName, setFiltroName] = useState<string>('')
-    const [filtroCPF, setFiltroCPF] = useState<string>('')
+
     const [loading, setLoading] = useState<boolean>(true);
     const [leadData, setLeadData] = useState<DadosPaciente>({} as DadosPaciente)
     const [openModalNewPatient, setOpenModalNewPatient] = useState<boolean>(false)
@@ -71,16 +67,13 @@ const AdminLeads: React.FC = () => {
 
         fetchLeads().then()
     }, [fetchLeads])
-    const handleConfirmationBooking = () => {
-        openFlexiveModal('Confirmação de Agendamento', ModalType.bookingConfirmation)
-    }
+
     const handleConfirmationDelete = (id: number) => {
         setGeneralMessage("Deseja deletar o lead selecionado?")
         setTitle('Confirmação de Exclusão')
         setAction('Excluir')
         setDeleteId(id)
         setIsGeneralModalOpen(true)
-
     }
 
     const fetchCanal = useCallback(async () => {
@@ -119,12 +112,13 @@ const AdminLeads: React.FC = () => {
         try {
             if (auth.tenantId && deleteId) {
                 setIsGeneralModalOpen(false)
-                await deletePatient(deleteId.toString(),auth.tenantId).then(
+                await deleteLead(deleteId.toString(),auth.tenantId).then(
                     (result) => {
                         if(result.message && result.message.includes('FK_')){
                             handleModalMessage('Não é possível deletar um lead com agendamento ou procedimento realizado')
                             return
                         } else {
+                            fetchLeads().then()
                             return result
                         }
                     }
@@ -168,27 +162,6 @@ const AdminLeads: React.FC = () => {
                 <Cards name='Total de Leads' content={pacientes?.length}/>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-3 mb-5">
-                <div className='p-2'>
-                    <Label htmlFor="filtroNome" className="text-oxfordBlue">Nome</Label>
-                    <Input
-                        className="w-72"
-                        id="filtroNome"
-                        placeholder="Filtrar por nome"
-                        value={filtroName}
-                        onChange={(e) => setFiltroName(e.target.value)}/>
-                </div>
-                <div className='p-2'>
-                    <Label htmlFor="filtroCPF" className="text-oxfordBlue">CPF</Label>
-                    <Input
-                        className="w-72"
-                        id="filtroCPF"
-                        placeholder="Filtrar por CPF"
-                        value={filtroCPF}
-                        onChange={(e) => setFiltroCPF(e.target.value)}/>
-                </div>
-            </div>
-
             <Card>
                 <CardContent>
                     {
@@ -228,7 +201,6 @@ const AdminLeads: React.FC = () => {
                 onClose={() => setOpenModalNewPatient(false)}
                 type={type}
                 data={leadData}
-                modalNewBookingConfirmation={handleConfirmationBooking}
             />}
 
             <GeneralModal
