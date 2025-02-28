@@ -58,7 +58,7 @@ export const listPatientsByTenant = async (tenantId: number, filters?: PatientFi
     }
 }
 
-export const updatePatient = async (patientData: DadosPaciente, tenantId: number) => {
+export const updatePatient = async (patientData: DadosPaciente, tenantId: number | undefined) => {
     try {
         return await apiClient.put(`admin/patient/${patientData.id}`,patientData,{
             headers: {

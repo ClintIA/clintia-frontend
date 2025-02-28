@@ -23,6 +23,8 @@ import {IMarketing} from "@/types/Marketing.ts";
 import {LoadingBar} from "@/components/LoadingBar.tsx";
 import {registerBookingWithPatient, registerPatientExam} from "@/services/patientExamService.tsx";
 import {BookingConfirmationState} from "@/components/AdminBooking/BookingConfirmation.tsx";
+import {CreateLeadDTO} from "@/types/dto/CreateLead.ts";
+import {createRegisterLead} from "@/services/leadService.tsx";
 
 export interface ExamesSelect {
     id: number
@@ -207,7 +209,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
         const { name, value } = e.target
         setDadosBooking(prev => ({ ...prev, [name]: value }))
     }
-    const submitBookingExam = async (bookingDados: DadosBooking, tenantId: number, patientData?: DadosPaciente) => {
+    const submitBookingExam = async (bookingDados: DadosBooking, tenantId: number | undefined, patientData?: DadosPaciente) => {
         try {
                 if(patientData) {
                    const result = await updatePatient(patientData, tenantId)
@@ -255,12 +257,11 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
            }
        }
        const doctorSelected = doctors?.find(e => e.id === dadosBooking.doctorId);
-       try {
+
            if (auth.tenantId && auth.userId) {
                setIsLoading(true)
-               if(isNewPatient) {
-
-                   if(patientData) {
+               if (isNewPatient) {
+                   if (patientData) {
                        patientData.phone = phone
                        patientData.canal = selectedCanal
                        patientData.contactChannel = selectedChannelContact
@@ -273,332 +274,355 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                            examDate: createDate(dadosBooking.examDate),
 
                        }
-                      const result = await submitBookintWithPatient(bookingWithPatient, auth.tenantId)
-                       if(result.status === 201 && handleModalMessage) {
-                           handleModalMessage(ModalType.bookingConfirmation, undefined,result?.data.data.data)
-                           setStep(3)
+                       try {
+                           const result = await submitBookintWithPatient(bookingWithPatient, auth.tenantId)
+                           if (result.status === 201 && handleModalMessage) {
+                               handleModalMessage(ModalType.bookingConfirmation, undefined, result?.data.data.data)
+                               setStep(3)
+                           }
+                           return
+                       } catch (error) {
+                           setErro('Erro ao cadastrar novo paciente' + error)
                        }
-                       return
                    }
                }
+
                const bookingDados = {
                    ...dadosBooking,
                    examDate: createDate(dadosBooking.examDate),
                    doctor: doctorSelected,
                    doctorId: parseInt(selectedDoctor) || undefined
                }
-               try {
-                   if (patientData) {
-                       patientData.phone = phone
-                       patientData.canal = selectedCanal
-                       patientData.contactChannel = selectedChannelContact
+               if (patientData) {
+                   patientData.phone = phone
+                   patientData.canal = selectedCanal
+                   patientData.contactChannel = selectedChannelContact
 
-                       const result = await submitBookingExam(bookingDados,auth.tenantId, patientData)
-                       if(result.status !== 201) {
-                           setErro('Erro ao salvar paciente, verifique os dados')
-                           toast({
-                               title:'Clintia',
-                               description: 'Erro ao salvar paciente, verifique os dados'
-                           })
-
-                       }
-                       if(result.status === 201 && handleModalMessage) {
-                           handleModalMessage(ModalType.bookingConfirmation,undefined, result?.data.data.data)
-                           setStep(3)
-                       }
+                   const createLead: CreateLeadDTO = {
+                       name: patientData.full_name,
+                       phoneNumber: patientData.phone.replace(/\D/g, '') || undefined,
+                       canal: patientData.canal || undefined,
+                       indication_name: patientData.indication_name || undefined,
+                       contactChannel: patientData.contactChannel || undefined,
+                       diagnosis: patientData.diagnostic || undefined,
+                       scheduled: !!bookingDados.examDate,
+                       scheduledDate: bookingDados.examDate || undefined,
+                       scheduledDoctorId: bookingDados.doctorId || undefined,
+                       examId: bookingDados.examId || undefined,
                    }
-               } catch (error) {
-                   console.error(error)
+                   try {
+                       await createRegisterLead(createLead, auth.tenantId).then(
+                           async (res) => {
+                               if (res.status === 201) {
+                                   const result = await submitBookingExam(bookingDados, auth.tenantId, patientData)
+                                   if (result.status !== 201) {
+                                       setErro('Erro ao salvar paciente, verifique os dados')
+                                   toast({
+                                       title: 'Clintia',
+                                       description: 'Erro ao salvar paciente, verifique os dados'
+                                   })
+                                       }
+
+                                   if (result.status === 201 && handleModalMessage) {
+                                       handleModalMessage(ModalType.bookingConfirmation, undefined, result?.data.data.data)
+                                       setStep(3)
+                                   }
+                               }
+                           }
+                       ).catch(() => {
+                           toast({
+                               title: 'Clintia',
+                               description: 'Erro ao salvar paciente'
+                           })
+                       })
+
+                   } catch (error) {
+                       console.error(error)
+                   }
+                   setDadosBooking({
+                       examDate: '',
+                       patientId: undefined,
+                       examId: undefined,
+                       doctorId: undefined,
+                       userId: undefined,
+                   })
                }
-               setDadosBooking({
-                   examDate: '',
-                   patientId: undefined,
-                   examId: undefined,
-                   doctorId: undefined,
-                   userId: undefined,
-               })
            }
-       } catch (error) {
-           setErro('Falha ao cadastrar paciente. Por favor, tente novamente.')
-           console.log(error)
-       } finally {
-           setIsLoading(false)
+           }
 
-       }
-   }
-    if (loading) {
-        return <Loading />
-    }
+                   if (loading) {
+                       return <Loading />
+                   }
 
 
-    const handleRegisterLead = async () => {
-        setErro(null);
+                   const handleRegisterLead = async () => {
+                       setErro(null);
 
-        if(handleModalMessage) {
-            handleModalMessage(ModalType.newLead,exames)
-        }
+                       if(handleModalMessage) {
+                           handleModalMessage(ModalType.newLead,exames)
+                       }
 
 
-    };
-    
+                   };
 
-    return (
-        <div className="w-full mx-auto mt-10">
-            <Card className="w-full">
-                <CardHeader>
-                    <CardTitle className="text-xl text-oxfordBlue">{title}</CardTitle>
-                    <CardDescription>Preencha os detalhes do paciente abaixo. Clique em salvar para
-                        continuar.</CardDescription>
-                    {isLoading && (<div className="space-y-2">
-                        <LoadingBar
-                            progress={undefined}
-                            height={8}
-                            color="#051E32"
-                            className="mb-8"
-                            indeterminate={isLoading}
-                        />
-                    </div>)}
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit}>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div className="col-span-4 space-y-2">
-                                <Label htmlFor="phone" className="text-oxfordBlue">
-                                    Telefone
-                                </Label>
-                                <div className="flex items-center gap-2">
-                                    <Input
-                                        id="phone"
-                                        name="phone"
-                                        placeholder="Telefone com DDD"
-                                        value={phone}
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        disabled={notFoundPhone}
-                                        className="flex-grow"
-                                    />
-                                    {showForm ? (
-                                        <Button className="bg-oxfordBlue text-white" onClick={clearCpf}>
-                                            Limpar
-                                        </Button>
-                                    ) : (
-                                        <Button className="bg-oxfordBlue text-white" onClick={handlePhoneCheck}>
-                                            Verificar
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
 
-                            {showForm && (
-                                <>
-                                    <div className="col-span-2 space-y-2">
-                                        <Label htmlFor="full_name" className="text-oxfordBlue">
-                                            Nome
-                                        </Label>
-                                        <Input
-                                            id="full_name"
-                                            name="full_name"
-                                            value={patientData?.full_name}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                    <div className="col-span-2 space-y-2">
-                                        <Label htmlFor="cpf" className="text-oxfordBlue">
-                                            CPF
-                                        </Label>
-                                        <Input id="cpf" name="cpf" value={patientData?.cpf}
-                                               onChange={handleInputChange}/>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="email" className="text-oxfordBlue">
-                                            Email
-                                        </Label>
-                                        <Input id="email" name="email" value={patientData?.email}
-                                               onChange={handleInputChange}/>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="health_card_number" className="text-oxfordBlue">
-                                            Plano de Saúde
-                                        </Label>
-                                        <Input
-                                            id="health_card_number"
-                                            name="health_card_number"
-                                            type="tel"
-                                            value={patientData?.health_card_number}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="dob" className="text-oxfordBlue">
-                                            Data de Nascimento
-                                        </Label>
-                                        <Input id="dob" name="dob" type="date" value={patientData?.dob}
-                                               onChange={handleInputChange}/>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="cep" className="text-oxfordBlue">
-                                            CEP
-                                        </Label>
-                                        <Input id="cep" name="cep" type="text" value={patientData?.cep}
-                                               onChange={handleInputChange}/>
-                                    </div>
-                                    <div className=" space-y-2">
-                                        <Label htmlFor="contactChannel" className="text-oxfordBlue">
-                                            Canal de Contato
-                                        </Label>
-                                        <Select value={selectedChannelContact} onValueChange={setSelectedChannelContact}>
-                                            <SelectTrigger id="contactChannel">
-                                                <SelectValue placeholder="Canal de Contato"/>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {contactChannel.map((c) => (
-                                                    <SelectItem key={c.value} value={c.value}>
-                                                        {c.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className=" space-y-2">
-                                        <Label htmlFor="canal" className="text-oxfordBlue">
-                                            Canal de Captação
-                                        </Label>
-                                        <Select value={selectedCanal} onValueChange={setSelectedCanal}>
-                                            <SelectTrigger id="canal">
-                                                <SelectValue placeholder="Canal de Captação"/>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {canal.map((c) => (
-                                                    <SelectItem key={c.id} value={c.id ? c.id.toString() : ""}>
-                                                        {c.canal}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    {canal.map((item) => {
-                                            if ((selectedCanal == item.id) && (item.canal == "Indicação" || item.canal == "Outros")) {
-                                                return (
-                                                    <div className="space-y-2">
-                                                        <Label htmlFor="indication_name" className="text-oxfordBlue">
-                                                            Nome
-                                                        </Label>
-                                                        <Input id="cep" name="indication_name" type="text" value={patientData?.indication_name}
-                                                               onChange={handleInputChange}/>
-                                                    </div>
-                                                )
-                                            }
-                                        }
-                                    )}
-                                    <div className="col-span-4 space-y-2">
-                                        <Label htmlFor="gender" className="text-oxfordBlue">
-                                            Gênero
-                                        </Label>
-                                        <div className="flex flex-row gap-4">
-                                            {genderOptions.map((option) => (
-                                                <label key={option.value}
-                                                       className="flex items-center space-x-2 cursor-pointer">
-                                                    <input
-                                                        type="radio"
-                                                        name="gender"
-                                                        value={option.value}
-                                                        checked={patientData?.gender === option.value}
-                                                        onChange={handleInputChange}
-                                                        className="form-radio h-4 w-4 text-oxfordBlue focus:ring-blue-800 border-gray-300"
-                                                    />
-                                                    <span className="text-sm text-oxfordBlue">{option.label}</span>
-                                                </label>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className="col-span-4 space-y-2">
-                                        <Label htmlFor="diagnostic" className="text-oxfordBlue">
-                                            Diagnóstico
-                                        </Label>
-                                        <Input
-                                            id="diagnostic"
-                                            name="diagnostic"
-                                            type="text"
-                                            value={patientData?.diagnostic}
-                                            onChange={handleInputChange}
-                                            className="h-16"
-                                        />
-                                    </div>
-                                    <div className=" space-y-2">
-                                        <Label htmlFor="examId" className="text-oxfordBlue">
-                                            Exame
-                                        </Label>
-                                        <Select disabled={!patientData} value={selectedExame}
-                                                onValueChange={setSelectedExame}>
-                                            <SelectTrigger id="examId">
-                                                <SelectValue placeholder="Selecione o Exame"/>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {exames.map((exam) => (
-                                                    <SelectItem key={exam.id} value={exam.id.toString()}>
-                                                        {exam.exam_name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className=" space-y-2">
-                                        <Label htmlFor="doctor" className="text-oxfordBlue">
-                                            Profissional
-                                        </Label>
-                                        {isLoading ? (
-                                            <div className="flex items-center justify-center h-10">
-                                                <Spinner size={16} className="text-muted-foreground"/>
-                                            </div>
-                                        ) : (
-                                            <Select disabled={!patientData} value={selectedDoctor}
-                                                    onValueChange={setSelectedDoctor}>
-                                                <SelectTrigger id="doctor">
-                                                    <SelectValue placeholder="Selecione o Profissional"/>
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {doctors?.map((doctor) => (
-                                                        <SelectItem key={doctor.id} value={doctor.id.toString()}>
-                                                            {doctor.fullName}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        )}
-                                    </div>
-                                    <div className=" space-y-2">
-                                        <Label htmlFor="examDate" className="text-oxfordBlue">
-                                            Dia do Exame
-                                        </Label>
-                                        <Input id="examDate" name="examDate" type="datetime-local"
-                                               onChange={handleInputBookingChange}/>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                        { showForm && (<div className="flex justify-between mt-8 gap-4">
-                            <Button className="bg-oxfordBlue text-white w-70" type="button"
-                                    onClick={handleRegisterLead}>
-                                Registrar Contato
-                            </Button>
-                            <Button disabled={!selectedExame} className="bg-oxfordBlue text-white w-70" type="submit">
-                                Salvar Agendamento
-                            </Button>
-                        </div>)}
-                    </form>
-                </CardContent>
-                <CardFooter>
-                    {erro && (
-                        <Alert variant="destructive">
-                            <AlertCircle className="h-4 w-4"/>
-                            <AlertTitle>Erro</AlertTitle>
-                            <AlertDescription>{erro}</AlertDescription>
-                        </Alert>
-                    )}
-                </CardFooter>
-            </Card>
-        </div>
+                   return (
+                       <div className="w-full mx-auto mt-10">
+                           <Card className="w-full">
+                               <CardHeader>
+                                   <CardTitle className="text-xl text-oxfordBlue">{title}</CardTitle>
+                                   <CardDescription>Preencha os detalhes do paciente abaixo. Clique em salvar para
+                                       continuar.</CardDescription>
+                                   {isLoading && (<div className="space-y-2">
+                                       <LoadingBar
+                                           progress={undefined}
+                                           height={8}
+                                           color="#051E32"
+                                           className="mb-8"
+                                           indeterminate={isLoading}
+                                       />
+                                   </div>)}
+                               </CardHeader>
+                               <CardContent>
+                                   <form onSubmit={handleSubmit}>
+                                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                           <div className="col-span-4 space-y-2">
+                                               <Label htmlFor="phone" className="text-oxfordBlue">
+                                                   Telefone
+                                               </Label>
+                                               <div className="flex items-center gap-2">
+                                                   <Input
+                                                       id="phone"
+                                                       name="phone"
+                                                       placeholder="Telefone com DDD"
+                                                       value={phone}
+                                                       onChange={(e) => setPhone(e.target.value)}
+                                                       disabled={notFoundPhone}
+                                                       className="flex-grow"
+                                                   />
+                                                   {showForm ? (
+                                                       <Button className="bg-oxfordBlue text-white" onClick={clearCpf}>
+                                                           Limpar
+                                                       </Button>
+                                                   ) : (
+                                                       <Button className="bg-oxfordBlue text-white" onClick={handlePhoneCheck}>
+                                                           Verificar
+                                                       </Button>
+                                                   )}
+                                               </div>
+                                           </div>
 
-    )
-}
+                                           {showForm && (
+                                               <>
+                                                   <div className="col-span-2 space-y-2">
+                                                       <Label htmlFor="full_name" className="text-oxfordBlue">
+                                                           Nome
+                                                       </Label>
+                                                       <Input
+                                                           id="full_name"
+                                                           name="full_name"
+                                                           value={patientData?.full_name}
+                                                           onChange={handleInputChange}
+                                                       />
+                                                   </div>
+                                                   <div className="col-span-2 space-y-2">
+                                                       <Label htmlFor="cpf" className="text-oxfordBlue">
+                                                           CPF
+                                                       </Label>
+                                                       <Input id="cpf" name="cpf" value={patientData?.cpf}
+                                                              onChange={handleInputChange}/>
+                                                   </div>
+                                                   <div className="space-y-2">
+                                                       <Label htmlFor="email" className="text-oxfordBlue">
+                                                           Email
+                                                       </Label>
+                                                       <Input id="email" name="email" value={patientData?.email}
+                                                              onChange={handleInputChange}/>
+                                                   </div>
+                                                   <div className="space-y-2">
+                                                       <Label htmlFor="health_card_number" className="text-oxfordBlue">
+                                                           Plano de Saúde
+                                                       </Label>
+                                                       <Input
+                                                           id="health_card_number"
+                                                           name="health_card_number"
+                                                           type="tel"
+                                                           value={patientData?.health_card_number}
+                                                           onChange={handleInputChange}
+                                                       />
+                                                   </div>
+                                                   <div className="space-y-2">
+                                                       <Label htmlFor="dob" className="text-oxfordBlue">
+                                                           Data de Nascimento
+                                                       </Label>
+                                                       <Input id="dob" name="dob" type="date" value={patientData?.dob}
+                                                              onChange={handleInputChange}/>
+                                                   </div>
+                                                   <div className="space-y-2">
+                                                       <Label htmlFor="cep" className="text-oxfordBlue">
+                                                           CEP
+                                                       </Label>
+                                                       <Input id="cep" name="cep" type="text" value={patientData?.cep}
+                                                              onChange={handleInputChange}/>
+                                                   </div>
+                                                   <div className=" space-y-2">
+                                                       <Label htmlFor="contactChannel" className="text-oxfordBlue">
+                                                           Canal de Contato
+                                                       </Label>
+                                                       <Select value={selectedChannelContact} onValueChange={setSelectedChannelContact}>
+                                                           <SelectTrigger id="contactChannel">
+                                                               <SelectValue placeholder="Canal de Contato"/>
+                                                           </SelectTrigger>
+                                                           <SelectContent>
+                                                               {contactChannel.map((c) => (
+                                                                   <SelectItem key={c.value} value={c.value}>
+                                                                       {c.label}
+                                                                   </SelectItem>
+                                                               ))}
+                                                           </SelectContent>
+                                                       </Select>
+                                                   </div>
+                                                   <div className=" space-y-2">
+                                                       <Label htmlFor="canal" className="text-oxfordBlue">
+                                                           Canal de Captação
+                                                       </Label>
+                                                       <Select value={selectedCanal} onValueChange={setSelectedCanal}>
+                                                           <SelectTrigger id="canal">
+                                                               <SelectValue placeholder="Canal de Captação"/>
+                                                           </SelectTrigger>
+                                                           <SelectContent>
+                                                               {canal.map((c) => (
+                                                                   <SelectItem key={c.id} value={c.id ? c.id.toString() : ""}>
+                                                                       {c.canal}
+                                                                   </SelectItem>
+                                                               ))}
+                                                           </SelectContent>
+                                                       </Select>
+                                                   </div>
+                                                   {canal.map((item) => {
+                                                           if ((selectedCanal == item.id) && (item.canal == "Indicação" || item.canal == "Outros")) {
+                                                               return (
+                                                                   <div className="space-y-2">
+                                                                       <Label htmlFor="indication_name" className="text-oxfordBlue">
+                                                                           Nome
+                                                                       </Label>
+                                                                       <Input id="cep" name="indication_name" type="text" value={patientData?.indication_name}
+                                                                              onChange={handleInputChange}/>
+                                                                   </div>
+                                                               )
+                                                           }
+                                                       }
+                                                   )}
+                                                   <div className="col-span-4 space-y-2">
+                                                       <Label htmlFor="gender" className="text-oxfordBlue">
+                                                           Gênero
+                                                       </Label>
+                                                       <div className="flex flex-row gap-4">
+                                                           {genderOptions.map((option) => (
+                                                               <label key={option.value}
+                                                                      className="flex items-center space-x-2 cursor-pointer">
+                                                                   <input
+                                                                       type="radio"
+                                                                       name="gender"
+                                                                       value={option.value}
+                                                                       checked={patientData?.gender === option.value}
+                                                                       onChange={handleInputChange}
+                                                                       className="form-radio h-4 w-4 text-oxfordBlue focus:ring-blue-800 border-gray-300"
+                                                                   />
+                                                                   <span className="text-sm text-oxfordBlue">{option.label}</span>
+                                                               </label>
+                                                           ))}
+                                                       </div>
+                                                   </div>
+                                                   <div className="col-span-4 space-y-2">
+                                                       <Label htmlFor="diagnostic" className="text-oxfordBlue">
+                                                           Diagnóstico
+                                                       </Label>
+                                                       <Input
+                                                           id="diagnostic"
+                                                           name="diagnostic"
+                                                           type="text"
+                                                           value={patientData?.diagnostic}
+                                                           onChange={handleInputChange}
+                                                           className="h-16"
+                                                       />
+                                                   </div>
+                                                   <div className=" space-y-2">
+                                                       <Label htmlFor="examId" className="text-oxfordBlue">
+                                                           Exame
+                                                       </Label>
+                                                       <Select disabled={!patientData} value={selectedExame}
+                                                               onValueChange={setSelectedExame}>
+                                                           <SelectTrigger id="examId">
+                                                               <SelectValue placeholder="Selecione o Exame"/>
+                                                           </SelectTrigger>
+                                                           <SelectContent>
+                                                               {exames.map((exam) => (
+                                                                   <SelectItem key={exam.id} value={exam.id.toString()}>
+                                                                       {exam.exam_name}
+                                                                   </SelectItem>
+                                                               ))}
+                                                           </SelectContent>
+                                                       </Select>
+                                                   </div>
+                                                   <div className=" space-y-2">
+                                                       <Label htmlFor="doctor" className="text-oxfordBlue">
+                                                           Profissional
+                                                       </Label>
+                                                       {isLoading ? (
+                                                           <div className="flex items-center justify-center h-10">
+                                                               <Spinner size={16} className="text-muted-foreground"/>
+                                                           </div>
+                                                       ) : (
+                                                           <Select disabled={!patientData} value={selectedDoctor}
+                                                                   onValueChange={setSelectedDoctor}>
+                                                               <SelectTrigger id="doctor">
+                                                                   <SelectValue placeholder="Selecione o Profissional"/>
+                                                               </SelectTrigger>
+                                                               <SelectContent>
+                                                                   {doctors?.map((doctor) => (
+                                                                       <SelectItem key={doctor.id} value={doctor.id.toString()}>
+                                                                           {doctor.fullName}
+                                                                       </SelectItem>
+                                                                   ))}
+                                                               </SelectContent>
+                                                           </Select>
+                                                       )}
+                                                   </div>
+                                                   <div className=" space-y-2">
+                                                       <Label htmlFor="examDate" className="text-oxfordBlue">
+                                                           Dia do Exame
+                                                       </Label>
+                                                       <Input id="examDate" name="examDate" type="datetime-local"
+                                                              onChange={handleInputBookingChange}/>
+                                                   </div>
+                                               </>
+                                           )}
+                                       </div>
+                                       { showForm && (<div className="flex justify-between mt-8 gap-4">
+                                           <Button className="bg-oxfordBlue text-white w-70" type="button"
+                                                   onClick={handleRegisterLead}>
+                                               Registrar Contato
+                                           </Button>
+                                           <Button disabled={!selectedExame} className="bg-oxfordBlue text-white w-70" type="submit">
+                                               Salvar Agendamento
+                                           </Button>
+                                       </div>)}
+                                   </form>
+                               </CardContent>
+                               <CardFooter>
+                                   {erro && (
+                                       <Alert variant="destructive">
+                                           <AlertCircle className="h-4 w-4"/>
+                                           <AlertTitle>Erro</AlertTitle>
+                                           <AlertDescription>{erro}</AlertDescription>
+                                       </Alert>
+                                   )}
+                               </CardFooter>
+                           </Card>
+                       </div>
+
+                   )
+           }
 
 export default RegisterBookingAndPatient;

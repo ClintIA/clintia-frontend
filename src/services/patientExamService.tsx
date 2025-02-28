@@ -11,7 +11,7 @@ interface ListPatientExamsFilters {
     patientName?: string
 }
 
-export const registerPatientExam = async (dadosBooking: DadosBooking, tenantId: number) => {
+export const registerPatientExam = async (dadosBooking: DadosBooking, tenantId: number | undefined) => {
 
     try {
         return await apiClient.post('admin/patientExams', dadosBooking, {
