@@ -32,7 +32,7 @@ export const createRegisterLead = async (leadRegister: CreateLeadDTO, tenantId: 
         }
     }
 }
-export const updateLead = async (leadData: CreateLeadDTO, tenantId: number) => {
+export const updateLead = async (leadData: CreateLeadDTO, tenantId: number | undefined) => {
     try {
         return await apiClient.put(`admin/leads/${leadData.id}`,leadData,{
             headers: {

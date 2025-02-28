@@ -16,6 +16,10 @@ import {ModalType} from "@/types/ModalType.ts";
 import NoDataTable from "@/components/NoDataTable.tsx";
 import {listLeadsByTenant} from "@/services/leadService.tsx";
 import {CreateLeadDTO} from "@/types/dto/CreateLead.ts";
+import {listCanalMarketing} from "@/services/marketingService.ts";
+import {IMarketing} from "@/types/Marketing.ts";
+import {format} from "date-fns";
+import {ptBR} from "date-fns/locale";
 
 const AdminLeads: React.FC = () => {
 
@@ -31,9 +35,11 @@ const AdminLeads: React.FC = () => {
     const [filtroName, setFiltroName] = useState<string>('')
     const [filtroCPF, setFiltroCPF] = useState<string>('')
     const [loading, setLoading] = useState<boolean>(true);
-    const [dadosPaciente, setDadosPaciente] = useState<DadosPaciente>({} as DadosPaciente)
+    const [leadData, setLeadData] = useState<DadosPaciente>({} as DadosPaciente)
     const [openModalNewPatient, setOpenModalNewPatient] = useState<boolean>(false)
     const [type,setType] = useState<ModalType>(ModalType.newPatient)
+    const [canal, setCanal] = useState<IMarketing[]>([])
+
     const auth = useAuth()
 
     const fetchLeads = useCallback(async () => {
@@ -76,23 +82,39 @@ const AdminLeads: React.FC = () => {
         setIsGeneralModalOpen(true)
 
     }
-    const formatDate = (date?: string) => {
-        if(date) {
-            const spliData = new Date(date).toLocaleDateString().split("/");
-            return spliData[1] + "/" + spliData[0] + "/" + spliData[2]
+
+    const fetchCanal = useCallback(async () => {
+        if (auth.tenantId) {
+            const result = await listCanalMarketing(auth.tenantId)
+            if (result.data) {
+                setCanal(result.data.data)
+            }
         }
-    }
+    }, [auth.tenantId])
+    useEffect(   () => {
+        fetchCanal().then()
+    }, [fetchCanal]);
 
     const renderRow = (lead: CreateLeadDTO) => (
         <>
             <TableCell className="text-oxfordBlue font-bold">{lead.name || 'Sem Registro'}</TableCell>
             <TableCell className="text-oxfordBlue">{lead.phoneNumber || 'Sem Registro'}</TableCell>
-            <TableCell className="text-oxfordBlue">{lead.canal || 'Sem Registro'}</TableCell>
-            <TableCell className="text-oxfordBlue">{lead.contactChannel || 'Sem Registro'}</TableCell>
-            <TableCell className="text-oxfordBlue">{lead.scheduled || 'Sem Registro'}</TableCell>
-            <TableCell className="text-oxfordBlue">{formatDate(lead.scheduledDate) || 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue">{lead.callDate  ? format(lead.callDate, "dd/MM/yyyy", {locale: ptBR}) : 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue">{canal.map((item) => (
+                <span>
+                    {(item.id === Number(lead.canal)) ? item.canal : <></>}
+                </span>
+            ))}</TableCell>
+            <TableCell className="text-oxfordBlue capitalize">{lead.indication_name || 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue capitalize">{lead.contactChannel || 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue">{lead.scheduledDate ? format(lead.scheduledDate, "dd/MM/yyyy", {locale: ptBR}) : 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue capitalize">{lead.scheduledDoctor?.fullName || 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue capitalize">{lead.exam?.exam_name || 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue capitalize">{lead.diagnosis || 'Sem Registro'}</TableCell>
+
         </>
     );
+
     const handleDeletePatient = async () => {
         try {
             if (auth.tenantId && deleteId) {
@@ -121,9 +143,9 @@ const AdminLeads: React.FC = () => {
         setIsGeneralModalOpen(true)
     }
 
-    const openFlexiveModal = (title: string, modalType: ModalType, paciente?: DadosPaciente) => {
-        if(paciente) {
-            setDadosPaciente(paciente)
+    const openFlexiveModal = (title: string, modalType: ModalType, lead?: CreateLeadDTO) => {
+        if(lead) {
+            setLeadData(lead)
         }
         setType(modalType)
         setTitleModal(title)
@@ -181,10 +203,15 @@ const AdminLeads: React.FC = () => {
                                         <TableRow>
                                             <TableHead className="text-oxfordBlue">Nome</TableHead>
                                             <TableHead className="text-oxfordBlue">Telefone</TableHead>
+                                            <TableHead className="text-oxfordBlue">Dia da Ligação</TableHead>
                                             <TableHead className="text-oxfordBlue">Canal</TableHead>
+                                            <TableHead className="text-oxfordBlue">Indicação</TableHead>
                                             <TableHead className="text-oxfordBlue">Canal de Contato</TableHead>
-                                            <TableHead className="text-oxfordBlue">Agendou</TableHead>
                                             <TableHead className="text-oxfordBlue">Data do Agendamento</TableHead>
+                                            <TableHead className="text-oxfordBlue">Médico Agendado</TableHead>
+                                            <TableHead className="text-oxfordBlue">Exame Agendado</TableHead>
+                                            <TableHead className="text-oxfordBlue">Diagnóstico</TableHead>
+
                                         </TableRow>
                                     </TableHeader>
                                     <DataTable renderRow={renderRow} openModalBooking={true} openModalEdit={openFlexiveModal}  deleteData={handleConfirmationDelete} dataTable={pacientes}></DataTable>
@@ -200,7 +227,7 @@ const AdminLeads: React.FC = () => {
                 title={titleModal}
                 onClose={() => setOpenModalNewPatient(false)}
                 type={type}
-                data={dadosPaciente}
+                data={leadData}
                 modalNewBookingConfirmation={handleConfirmationBooking}
             />}
 

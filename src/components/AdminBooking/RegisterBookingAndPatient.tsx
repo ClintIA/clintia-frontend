@@ -45,7 +45,7 @@ export interface BookingWithPatient {
     examDate?: string
 }
 interface BookingModalProps {
-    handleModalMessage?: (type: ModalType, exame?: ExamesSelect[], patientData?: BookingConfirmationState) => void
+    handleModalMessage?: (type: ModalType, patientData?: BookingConfirmationState) => void
     setStep: (step: number) => void
     title: string
 }
@@ -258,8 +258,29 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
        }
        const doctorSelected = doctors?.find(e => e.id === dadosBooking.doctorId);
 
-           if (auth.tenantId && auth.userId) {
+           if (auth.tenantId && auth.userId && patientData) {
+
+               const bookingDados = {
+                   ...dadosBooking,
+                   examDate: createDate(dadosBooking.examDate),
+                   doctor: doctorSelected,
+                   doctorId: parseInt(selectedDoctor) || undefined
+               }
+               const createLead: CreateLeadDTO = {
+                   name: patientData.full_name,
+                   phoneNumber: patientData.phone?.replace(/\D/g, '') || undefined,
+                   canal: patientData.canal || undefined,
+                   indication_name: patientData.indication_name || undefined,
+                   contactChannel: patientData.contactChannel || undefined,
+                   diagnosis: patientData.diagnostic || undefined,
+                   scheduled: !!bookingDados.examDate,
+                   scheduledDate: bookingDados.examDate || undefined,
+                   scheduledDoctorId: bookingDados.doctorId || undefined,
+                   examId: bookingDados.examId || undefined,
+               }
+
                setIsLoading(true)
+               await createRegisterLead(createLead, auth.tenantId)
                if (isNewPatient) {
                    if (patientData) {
                        patientData.phone = phone
@@ -277,7 +298,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                        try {
                            const result = await submitBookintWithPatient(bookingWithPatient, auth.tenantId)
                            if (result.status === 201 && handleModalMessage) {
-                               handleModalMessage(ModalType.bookingConfirmation, undefined, result?.data.data.data)
+                               handleModalMessage(ModalType.bookingConfirmation, result?.data.data.data)
                                setStep(3)
                            }
                            return
@@ -287,54 +308,24 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                    }
                }
 
-               const bookingDados = {
-                   ...dadosBooking,
-                   examDate: createDate(dadosBooking.examDate),
-                   doctor: doctorSelected,
-                   doctorId: parseInt(selectedDoctor) || undefined
-               }
                if (patientData) {
                    patientData.phone = phone
                    patientData.canal = selectedCanal
                    patientData.contactChannel = selectedChannelContact
-
-                   const createLead: CreateLeadDTO = {
-                       name: patientData.full_name,
-                       phoneNumber: patientData.phone.replace(/\D/g, '') || undefined,
-                       canal: patientData.canal || undefined,
-                       indication_name: patientData.indication_name || undefined,
-                       contactChannel: patientData.contactChannel || undefined,
-                       diagnosis: patientData.diagnostic || undefined,
-                       scheduled: !!bookingDados.examDate,
-                       scheduledDate: bookingDados.examDate || undefined,
-                       scheduledDoctorId: bookingDados.doctorId || undefined,
-                       examId: bookingDados.examId || undefined,
-                   }
                    try {
-                       await createRegisterLead(createLead, auth.tenantId).then(
-                           async (res) => {
-                               if (res.status === 201) {
-                                   const result = await submitBookingExam(bookingDados, auth.tenantId, patientData)
-                                   if (result.status !== 201) {
-                                       setErro('Erro ao salvar paciente, verifique os dados')
-                                   toast({
-                                       title: 'Clintia',
-                                       description: 'Erro ao salvar paciente, verifique os dados'
-                                   })
-                                       }
-
-                                   if (result.status === 201 && handleModalMessage) {
-                                       handleModalMessage(ModalType.bookingConfirmation, undefined, result?.data.data.data)
-                                       setStep(3)
-                                   }
-                               }
-                           }
-                       ).catch(() => {
+                       const result = await submitBookingExam(bookingDados, auth.tenantId, patientData)
+                       if (result.status !== 201) {
+                           setErro('Erro ao salvar paciente, verifique os dados')
                            toast({
                                title: 'Clintia',
-                               description: 'Erro ao salvar paciente'
+                               description: 'Erro ao salvar paciente, verifique os dados'
                            })
-                       })
+                       }
+
+                       if (result.status === 201 && handleModalMessage) {
+                           handleModalMessage(ModalType.bookingConfirmation, result?.data.data.data)
+                           setStep(3)
+                       }
 
                    } catch (error) {
                        console.error(error)
@@ -347,7 +338,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                        userId: undefined,
                    })
                }
-           }
+             }
            }
 
                    if (loading) {
@@ -359,7 +350,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                        setErro(null);
 
                        if(handleModalMessage) {
-                           handleModalMessage(ModalType.newLead,exames)
+                           handleModalMessage(ModalType.newLead)
                        }
 
 

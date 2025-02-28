@@ -36,15 +36,7 @@ const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUp
         const { name, value } = e.target
         setAdminData(prev => ({ ...prev, [name]: value }))
     }
-    useEffect(() => {
-        if(dadosIniciais) {
 
-            setAdminData(prevDados => ({
-                ...prevDados,
-                ...dadosIniciais
-            }))
-        }
-    }, [dadosIniciais])
     useEffect(() => {
         if(dadosIniciais) {
 

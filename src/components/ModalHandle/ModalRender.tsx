@@ -5,7 +5,7 @@ import RegisterBooking, {DadosBooking} from "@/components/AdminBooking/RegisterB
 import ModalFlexivel from "@/components/ModalHandle/ModalFlexivel.tsx";
 import { registerPatientExam} from "@/services/patientExamService.tsx";
 import {updatePatient} from "@/services/patientService.tsx";
-import RegisterBookingAndPatient, {ExamesSelect} from "@/components/AdminBooking/RegisterBookingAndPatient.tsx";
+import RegisterBookingAndPatient from "@/components/AdminBooking/RegisterBookingAndPatient.tsx";
 import BookingConfirmation, {BookingConfirmationState} from "@/components/AdminBooking/BookingConfirmation.tsx";
 import {ModalType} from "@/types/ModalType.ts";
 import {registerAdmin, updateAdmin} from "@/services/adminsService.tsx";
@@ -18,6 +18,7 @@ import RegisterTenantExam, {IExam} from "@/components/AdminTenantExam/RegisterTe
 import {IMarketing} from "@/types/Marketing.ts";
 import AdminLead from "@/components/AdminLead/AdminLead.tsx";
 import {Exams} from "@/pages/admin/AdminTenantExams.tsx";
+import {CreateLeadDTO} from "@/types/dto/CreateLead.ts";
 
 
 interface ModalRegisterProps {
@@ -26,7 +27,7 @@ interface ModalRegisterProps {
     title: string;
     modalNewBookingConfirmation?: (message: string) => void;
     modalMessage?: (message: string) => void;
-    data?: IAdmin | IDoctor | IMarketing | Exams | DadosPaciente
+    data?: IAdmin | IDoctor | IMarketing | Exams | DadosPaciente | CreateLeadDTO
     type: ModalType
     isDoctor?: boolean
     isStepper?: boolean
@@ -40,7 +41,7 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
     const [modalContent,setModalContent] = useState<ModalType>(ModalType.newPatient)
     const [patientData, setPatientData] = useState<BookingConfirmationState>({} as BookingConfirmationState)
     const [currentStep, setCurrentStep] = useState(0)
-    const [exames, setExames] = useState<ExamesSelect[]>([])
+    const [lead, setLead ] = useState<CreateLeadDTO>()
     const setStep = (step: number) => {
         setCurrentStep(step)
     }
@@ -48,12 +49,12 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
         openModal(type)
     }, [type])
 
-    const openModal = (type: ModalType, exam?: ExamesSelect[], patientData?: BookingConfirmationState) => {
+    const openModal = (type: ModalType, patientData?: BookingConfirmationState) => {
         if(patientData) {
             setPatientData(patientData)
         }
-        if(exam) {
-            setExames(exam)
+        if(data) {
+            setLead(data)
         }
         setModalContent(type)
         setOpen(true)
@@ -202,7 +203,7 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
             case 'newExam':
                 return(<RegisterTenantExam title={title} isNewExam={submitNewExam}/>)
             case 'newLead':
-                return(<AdminLead exams={exames} title={title}/>)
+                return(<AdminLead leadInfo={lead} title={title}/>)
         }
     }
     return (

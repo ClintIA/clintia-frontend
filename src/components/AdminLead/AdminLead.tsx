@@ -9,11 +9,11 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx"
 import {useAuth} from "@/hooks/auth.tsx";
 import {CreateLeadDTO} from "@/types/dto/CreateLead.ts";
 import {toast} from "@/hooks/use-toast.ts";
-import {createRegisterLead} from "@/services/leadService.tsx";
+import {createRegisterLead, updateLead} from "@/services/leadService.tsx";
 import {LoadingBar} from "@/components/LoadingBar.tsx";
 import {ExamesSelect} from "@/components/AdminBooking/RegisterBookingAndPatient.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-import {listDoctorByExam} from "@/services/tenantExamService.tsx";
+import {listDoctorByExam, listTenantExam} from "@/services/tenantExamService.tsx";
 import {Doctor} from "@/pages/admin/AdminTenantExams.tsx";
 import {Spinner} from "@/components/ui/Spinner.tsx";
 import {listCanalMarketing} from "@/services/marketingService.ts";
@@ -26,10 +26,10 @@ import {useNavigate} from "react-router-dom";
 interface LeadRegisterProps {
     newLead?: (pacienteDados: CreateLeadDTO, tenant: number) => Promise<any>
     title: string
-    exams?: ExamesSelect[]
+    leadInfo?: CreateLeadDTO
 }
 
-const AdminLead: React.FC<LeadRegisterProps> = ({ exams = []}: LeadRegisterProps) => {
+const AdminLead: React.FC<LeadRegisterProps> = ({leadInfo}: LeadRegisterProps) => {
 
     const [leadRegister, setLeadRegister] = useState<CreateLeadDTO>({} as CreateLeadDTO)
     const [erro, setErro] = useState<string | null>(null)
@@ -40,6 +40,7 @@ const AdminLead: React.FC<LeadRegisterProps> = ({ exams = []}: LeadRegisterProps
     const [canal, setCanal] = useState<IMarketing[]>([])
     const [selectedChannelContact, setSelectedChannelContact] = useState<string | undefined>('')
     const [selectedCanal, setSelectedCanal] = useState<string>('')
+    const [exames, setExames] = useState<ExamesSelect[]>([])
 
     const auth = useAuth()
     const navigate = useNavigate()
@@ -48,10 +49,46 @@ const AdminLead: React.FC<LeadRegisterProps> = ({ exams = []}: LeadRegisterProps
         setLeadRegister(prev => ({ ...prev, [name]: value }))
     }
     useEffect( () => {
+        const fetchExams = async () => {
+            try {
+                if(auth.tenantId) {
+                    const result = await listTenantExam(auth.tenantId)
+                    if(result?.data.data.length === 0 ) {
+                        setErro('Não possui procedimentos cadastrados')
+                        return
+                    }
+                    if(result?.data.status === "success") {
+                        setExames(result?.data.data)
+                        setErro(null)
+                        if(leadInfo) {
+                            setSelectedExame(leadInfo.exam?.id?.toString() || '')
+                        }
+
+                    }
+                }
+            } catch (error) {
+                setErro("Não possível carregar os procedimentos")
+                console.error(error)
+            }
+        }
+        fetchExams().then()
+    }, [auth.tenantId]);
+    useEffect(() => {
+        if(leadInfo) {
+            setLeadRegister(prevDados => ({
+                ...prevDados,
+                ...leadInfo
+            }))
+            console.log(leadInfo)
+            setSelectedCanal(leadInfo.canal || '')
+            setSelectedChannelContact(leadInfo.contactChannel)
+        }
+    }, [leadInfo])
+    useEffect( () => {
         const fetchDoctors = async () => {
             try {
                 if(auth.tenantId && selectedExame) {
-                    const exam = exams.find((exam) => exam.id === parseInt(selectedExame))
+                    const exam = exames.find((exam) => exam.id === parseInt(selectedExame))
                     if(exam) {
                         setIsLoading(true)
                         const result = await listDoctorByExam(auth.tenantId,exam.exam_name)
@@ -62,6 +99,9 @@ const AdminLead: React.FC<LeadRegisterProps> = ({ exams = []}: LeadRegisterProps
                             } else {
                                 setDoctors(result?.data.data)
                                 setErro(null)
+                                if(leadInfo) {
+                                    setSelectedDoctor(leadInfo.scheduledDoctor?.id?.toString() || '')
+                                }
                             }
                         }
                     }
@@ -74,7 +114,7 @@ const AdminLead: React.FC<LeadRegisterProps> = ({ exams = []}: LeadRegisterProps
             }
         }
         fetchDoctors().then()
-    }, [exams, selectedExame, auth.tenantId]);
+    }, [exames, selectedExame, auth.tenantId]);
     const fetchCanal = useCallback(async () => {
         if (auth.tenantId) {
             const result = await listCanalMarketing(auth.tenantId)
@@ -118,6 +158,40 @@ const AdminLead: React.FC<LeadRegisterProps> = ({ exams = []}: LeadRegisterProps
         } catch (error) {
             console.error(error);
             setErro('Falha ao registrar o contato.');
+        } finally {
+            setIsLoading(false)
+
+        }
+    }
+    const handleUpdateLead = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setErro(null)
+        try {
+            if (auth.tenantId) {
+                setIsLoading(true)
+
+                const response = await updateLead({...leadRegister,
+                    phoneNumber: leadRegister.phoneNumber?.replace(/\D/g, ''),
+                    scheduledDoctorId: parseInt(selectedDoctor) || undefined,
+                    examId: parseInt(selectedExame) || undefined,
+                    canal: selectedCanal,
+                    contactChannel: selectedChannelContact
+                }, leadInfo?.id)
+                if (response.status === 200) {
+                    toast({
+                        title: 'Sucesso!',
+                        description: 'Atualizado registrado com sucesso.',
+                    });
+                    setTimeout(() => {
+                       window.location.reload()
+                    },2000);
+                } else {
+                    setErro("Erro ao atualizar Lead")
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            setErro('Falha ao atualizar lead.');
         } finally {
             setIsLoading(false)
 
@@ -171,18 +245,6 @@ const AdminLead: React.FC<LeadRegisterProps> = ({ exams = []}: LeadRegisterProps
                                     onChange={handleInputChange}
                                     className="col-span-3"/>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="canal" className="text-right text-oxfordBlue">
-                                    Canal
-                                </Label>
-                                <Input
-                                    id="canal"
-                                    name="canal"
-                                    type="text"
-                                    value={leadRegister.canal}
-                                    onChange={handleInputChange}
-                                    className="col-span-3"/>
-                            </div>
                             <div className=" space-y-2">
                                 <Label htmlFor="contactChannel" className="text-oxfordBlue">
                                     Canal de Contato
@@ -210,7 +272,7 @@ const AdminLead: React.FC<LeadRegisterProps> = ({ exams = []}: LeadRegisterProps
                                     </SelectTrigger>
                                     <SelectContent>
                                         {canal.map((c) => (
-                                            <SelectItem key={c.id} value={c.id ? c.id.toString() : ""}>
+                                            <SelectItem key={c.id?.toString()} value={c.id ? c.id.toString() : ""}>
                                                 {c.canal}
                                             </SelectItem>
                                         ))}
@@ -254,8 +316,8 @@ const AdminLead: React.FC<LeadRegisterProps> = ({ exams = []}: LeadRegisterProps
                                         <SelectValue placeholder="Selecione o Exame"/>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {exams?.map((exam) => (
-                                            <SelectItem key={exam.id} value={exam.id.toString()}>
+                                        {exames?.map((exam) => (
+                                            <SelectItem key={exam.id.toString()} value={exam.id.toString()}>
                                                 {exam.exam_name}
                                             </SelectItem>
                                         ))}
@@ -278,7 +340,7 @@ const AdminLead: React.FC<LeadRegisterProps> = ({ exams = []}: LeadRegisterProps
                                         </SelectTrigger>
                                         <SelectContent>
                                             {doctors?.map((doctor) => (
-                                                <SelectItem key={doctor.id} value={doctor.id.toString()}>
+                                                <SelectItem key={doctor.id.toString()} value={doctor.id.toString()}>
                                                     {doctor.fullName}
                                                 </SelectItem>
                                             ))}
@@ -300,7 +362,9 @@ const AdminLead: React.FC<LeadRegisterProps> = ({ exams = []}: LeadRegisterProps
                             </div>
                         </div>
                         <div className="flex justify-end mt-6">
-                            <Button className="bg-oxfordBlue text-white" type="submit">Registrar Contato</Button>
+                            {(!leadInfo) && (<Button className="bg-oxfordBlue text-white" type="submit">Registrar Lead</Button>)}
+                            {(leadInfo) && (<Button className="bg-oxfordBlue text-white" onClick={handleUpdateLead}>Atualizar
+                                Lead</Button>)}
                         </div>
                     </form>
                 </CardContent>
