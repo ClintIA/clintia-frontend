@@ -1,14 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx"
-import {Table, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx"
+import {Table, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx"
 import Cards from "@/components/Card.tsx";
 import {useAuth} from "@/hooks/auth.tsx";
-import {DadosPaciente} from "@/components/AdminPatient/RegisterPatient.tsx";
 import Loading from "@/components/Loading.tsx";
 import ModalRender from "@/components/ModalHandle/ModalRender.tsx";
 import DataTable from "@/components/DataTable.tsx";
 import GeneralModal from "@/components/ModalHandle/GeneralModal.tsx";
-import {TableCell} from "@mui/material";
 import {ModalType} from "@/types/ModalType.ts";
 import NoDataTable from "@/components/NoDataTable.tsx";
 import {deleteLead, listLeadsByTenant} from "@/services/leadService.tsx";
@@ -18,6 +16,11 @@ import {IMarketing} from "@/types/Marketing.ts";
 import {format} from "date-fns";
 import {ptBR} from "date-fns/locale";
 import {LeadDateFilter} from "@/components/AdminBooking/LeadDateFilter.tsx";
+import {Pagination} from "@/components/Pagination.tsx";
+import {days, months} from "@/lib/optionsFixed.ts";
+import {convertToCSV, downloadCSV} from "@/lib/csv-export.ts";
+import {Button} from "@/components/ui/button.tsx";
+import {Download} from "lucide-react";
 
 const AdminLeads: React.FC = () => {
 
@@ -29,7 +32,7 @@ const AdminLeads: React.FC = () => {
     const [generalMessage, setGeneralMessage] = useState<string>('')
     const [isGeneralModalOpen, setIsGeneralModalOpen] = useState(false)
     const [deleteId, setDeleteId] = useState<number>()
-    const [pacientes, setPacientes] = useState<DadosPaciente[]>([])
+    const [pacientes, setPacientes] = useState<CreateLeadDTO[]>([])
     const [dateFilters, setDateFilters] = useState<{
         day?: number
         month?: number
@@ -40,13 +43,18 @@ const AdminLeads: React.FC = () => {
         year: new Date().getFullYear()
     })
     const [loading, setLoading] = useState<boolean>(true);
-    const [leadData, setLeadData] = useState<DadosPaciente>({} as DadosPaciente)
+    const [leadData, setLeadData] = useState<CreateLeadDTO>({} as CreateLeadDTO)
     const [openModalNewPatient, setOpenModalNewPatient] = useState<boolean>(false)
     const [type,setType] = useState<ModalType>(ModalType.newPatient)
     const [canal, setCanal] = useState<IMarketing[]>([])
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10); // Você pode ajustar este número
     const auth = useAuth()
-
+    const getCurrentPageItems = () => {
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        return pacientes.slice(indexOfFirstItem, indexOfLastItem);
+    };
     const fetchLeads = useCallback(async (date?: { day?: number; month?: number; year?: number }) => {
         setLoading(true)
         try {
@@ -83,7 +91,33 @@ const AdminLeads: React.FC = () => {
         fetchLeads(date).then()
         setDateFilters(date)
     }
+    const exportToCSV = () => {
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        const filteredPacientes: CreateLeadDTO[] = pacientes.slice(indexOfFirstItem, indexOfLastItem);
+        const exportData = filteredPacientes.map((lead) => ({
+            ID: lead.id || '',
+            Nome: lead.name || '',
+            Telefone: lead.phoneNumber|| '',
+            Canal: canal.find(item => item.id == Number(lead.canal))?.canal || 'Sem Registro',
+            "Data do Contato": lead.callDate ? format(lead.callDate, "dd/MM/yyyy", {locale: ptBR}) : '',
+            ["Indicação"]: lead.indication_name,
+            "Canal de Contato": lead.contactChannel === "phone" ? "Telefone" : "Whatsapp",
+            Agendamento: lead.scheduledDate ? format(lead.scheduledDate, "dd/MM/yyyy", {locale: ptBR}) : '',
+            ["Médico Agendado"]: lead.scheduledDoctor?.fullName,
+            "Exame Agendado": lead.exam?.exam_name,
+            ["Diagnóstico"]: lead.diagnosis,
+        }))
 
+        const csvData = convertToCSV(exportData)
+
+        const date = new Date()
+        const formattedDate = date.toISOString().split("T")[0] // YYYY-MM-DD
+        const filename = `RELATORIO_LEADS_${formattedDate}.csv`
+
+        // Iniciar download
+        downloadCSV(csvData, filename)
+    }
     const handleConfirmationDelete = (id: number) => {
         setGeneralMessage("Deseja deletar o lead selecionado?")
         setTitle('Confirmação de Exclusão')
@@ -166,6 +200,9 @@ const AdminLeads: React.FC = () => {
         setIsGeneralModalOpen(false)
         fetchLeads().then()
     }
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [dateFilters]);
 
     if (loading) {
         return <Loading />
@@ -180,24 +217,40 @@ const AdminLeads: React.FC = () => {
 
             <Card>
                 <CardHeader>
-                    <div>
-                        <LeadDateFilter selectedDate={dateFilters.day} onFilterChange={handleDate} selectedMonth={dateFilters.month} selectedYear={dateFilters.year}/>
+                    <div className="flex flex-col space-y-4">
+                        <div>
+                            <LeadDateFilter selectedDate={dateFilters.day} onFilterChange={handleDate} selectedMonth={dateFilters.month} selectedYear={dateFilters.year}/>
+
+                        </div>
+                       <div>
+                           <Button onClick={exportToCSV} disabled={pacientes.length === 0 || loading} className="flex items-center gap-2">
+                               <Download className="h-4 w-4" />
+                               Exportar CSV
+                           </Button>
+                       </div>
                     </div>
+
                 </CardHeader>
                 <CardContent>
                     {
-                        pacientes.length === 0 ?
-                            (
-                                <div className="p-10">
-                                    <NoDataTable message="Não possui leads cadastrados"/>
-                                </div>
-                            ) : (
-                                <div>
-                                    {!dateFilters.day && !dateFilters.month && !dateFilters.year ||
-                                        (<CardTitle className="text-oxfordBlue text-xl p-4">
-                                        {`Leads do dia: ${dateFilters.day ?
-                                            dateFilters.day : new Date().getDate()}/${dateFilters.month ?
-                                            dateFilters.month : new Date().getMonth() + 1}/${dateFilters.year ?
+                        pacientes.length === 0 ? (
+                            <div className="p-10">
+                                <NoDataTable message="Não possui leads cadastrados"/>
+                            </div>
+                        ) : (
+                            <div>
+                                {!dateFilters.day && !dateFilters.month && !dateFilters.year ||
+                                    (<CardTitle className="text-oxfordBlue text-xl p-4">
+                                        {`
+                                             Mês: ${
+                                            dateFilters.day
+                                                ? days.find(item => item.toString() === dateFilters.day?.toString())
+                                                : 'Todos'},
+                                        Mês: ${
+                                            dateFilters.month
+                                                ? months.find(item => item.value === dateFilters.month?.toString())?.label
+                                                : 'Todos'},
+                                            Ano: ${dateFilters.year ?
                                             dateFilters.year : new Date().getFullYear()}`}
                                     </CardTitle>)}
                                 <Table>
@@ -213,15 +266,25 @@ const AdminLeads: React.FC = () => {
                                             <TableHead className="text-oxfordBlue">Médico Agendado</TableHead>
                                             <TableHead className="text-oxfordBlue">Exame Agendado</TableHead>
                                             <TableHead className="text-oxfordBlue">Diagnóstico</TableHead>
-
                                         </TableRow>
                                     </TableHeader>
-                                    <DataTable renderRow={renderRow} openModalBooking={true}
-                                               openModalEdit={openFlexiveModal} deleteData={handleConfirmationDelete}
-                                               dataTable={pacientes}></DataTable>
+                                    <DataTable
+                                        renderRow={renderRow}
+                                        openModalBooking={true}
+                                        openModalEdit={openFlexiveModal}
+                                        deleteData={handleConfirmationDelete}
+                                        dataTable={getCurrentPageItems()} // Use os itens da página atual
+                                    />
                                 </Table>
-                                </div>
-                            )
+
+                                <Pagination
+                                    totalItems={pacientes.length}
+                                    itemsPerPage={itemsPerPage}
+                                    currentPage={currentPage}
+                                    onPageChange={(page) => setCurrentPage(page)}
+                                />
+                            </div>
+                        )
                     }
                 </CardContent>
             </Card>
