@@ -1,14 +1,32 @@
 import {isAxiosError} from 'axios';
 import apiClient from "@/lib/interceptor.ts";
 import {CreateLeadDTO} from "@/types/dto/CreateLead.ts";
-
-export const listLeadsByTenant = async (tenantId: number) => {
-
+export interface LeadFilters {
+    tenantId?: number;
+    name?: string;
+    phoneNumber?: string;
+    scheduled?: boolean;
+    doctorId?: number;
+    examId?: number;
+    take?: number;
+    skip?: number;
+    day?: number;
+    month?: number;
+    year?: number;
+    callDate?: Date;
+}
+export const listLeadsByTenant = async (filters: {
+    day?: number;
+    month?: number;
+    year?: number
+} | undefined, tenantId: number) => {
     try {
         return await apiClient.get('admin/leads', {
             headers: {
                 'x-tenant-id': tenantId
-            }
+            },
+            params: filters
+
         })
 
     } catch (error) {

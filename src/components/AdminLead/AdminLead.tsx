@@ -79,7 +79,6 @@ const AdminLead: React.FC<LeadRegisterProps> = ({leadInfo}: LeadRegisterProps) =
                 ...prevDados,
                 ...leadInfo
             }))
-            console.log(leadInfo)
             setSelectedCanal(leadInfo.canal || '')
             setSelectedChannelContact(leadInfo.contactChannel)
         }

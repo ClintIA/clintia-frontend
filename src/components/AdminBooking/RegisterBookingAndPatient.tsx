@@ -435,7 +435,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                                            Plano de Saúde
                                                        </Label>
                                                        <Input
-                                                           id="health_card_number"
+                                                            id="health_card_number"
                                                            name="health_card_number"
                                                            type="tel"
                                                            value={patientData?.health_card_number}

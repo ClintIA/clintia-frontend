@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react'
-import {Card, CardContent} from "@/components/ui/card.tsx"
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx"
 import {Table, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx"
 import Cards from "@/components/Card.tsx";
 import {useAuth} from "@/hooks/auth.tsx";
@@ -17,6 +17,7 @@ import {listCanalMarketing} from "@/services/marketingService.ts";
 import {IMarketing} from "@/types/Marketing.ts";
 import {format} from "date-fns";
 import {ptBR} from "date-fns/locale";
+import {LeadDateFilter} from "@/components/AdminBooking/LeadDateFilter.tsx";
 
 const AdminLeads: React.FC = () => {
 
@@ -29,7 +30,15 @@ const AdminLeads: React.FC = () => {
     const [isGeneralModalOpen, setIsGeneralModalOpen] = useState(false)
     const [deleteId, setDeleteId] = useState<number>()
     const [pacientes, setPacientes] = useState<DadosPaciente[]>([])
-
+    const [dateFilters, setDateFilters] = useState<{
+        day?: number
+        month?: number
+        year?: number
+    }>({
+        day: new Date().getDate(),
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear()
+    })
     const [loading, setLoading] = useState<boolean>(true);
     const [leadData, setLeadData] = useState<DadosPaciente>({} as DadosPaciente)
     const [openModalNewPatient, setOpenModalNewPatient] = useState<boolean>(false)
@@ -38,14 +47,16 @@ const AdminLeads: React.FC = () => {
 
     const auth = useAuth()
 
-    const fetchLeads = useCallback(async () => {
+    const fetchLeads = useCallback(async (date?: { day?: number; month?: number; year?: number }) => {
         setLoading(true)
         try {
+
             if(auth.tenantId) {
-                const result = await listLeadsByTenant(auth.tenantId)
+                const result = await listLeadsByTenant(date, auth.tenantId)
                 if(result?.data.data) {
                     setLoading(false);
                     setPacientes(result?.data.data.leads)
+
                 } else {
                     setLoading(false);
                     setPacientes([])
@@ -65,8 +76,13 @@ const AdminLeads: React.FC = () => {
 
     useEffect(() => {
 
-        fetchLeads().then()
-    }, [fetchLeads])
+        fetchLeads(dateFilters).then()
+    }, [])
+
+    const handleDate = (date: { day?: number; month?: number; year?: number }) => {
+        fetchLeads(date).then()
+        setDateFilters(date)
+    }
 
     const handleConfirmationDelete = (id: number) => {
         setGeneralMessage("Deseja deletar o lead selecionado?")
@@ -163,6 +179,11 @@ const AdminLeads: React.FC = () => {
             </div>
 
             <Card>
+                <CardHeader>
+                    <div>
+                        <LeadDateFilter selectedDate={dateFilters.day} onFilterChange={handleDate} selectedMonth={dateFilters.month} selectedYear={dateFilters.year}/>
+                    </div>
+                </CardHeader>
                 <CardContent>
                     {
                         pacientes.length === 0 ?
@@ -171,6 +192,14 @@ const AdminLeads: React.FC = () => {
                                     <NoDataTable message="Não possui leads cadastrados"/>
                                 </div>
                             ) : (
+                                <div>
+                                    {!dateFilters.day && !dateFilters.month && !dateFilters.year ||
+                                        (<CardTitle className="text-oxfordBlue text-xl p-4">
+                                        {`Leads do dia: ${dateFilters.day ?
+                                            dateFilters.day : new Date().getDate()}/${dateFilters.month ?
+                                            dateFilters.month : new Date().getMonth() + 1}/${dateFilters.year ?
+                                            dateFilters.year : new Date().getFullYear()}`}
+                                    </CardTitle>)}
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
@@ -187,8 +216,11 @@ const AdminLeads: React.FC = () => {
 
                                         </TableRow>
                                     </TableHeader>
-                                    <DataTable renderRow={renderRow} openModalBooking={true} openModalEdit={openFlexiveModal}  deleteData={handleConfirmationDelete} dataTable={pacientes}></DataTable>
+                                    <DataTable renderRow={renderRow} openModalBooking={true}
+                                               openModalEdit={openFlexiveModal} deleteData={handleConfirmationDelete}
+                                               dataTable={pacientes}></DataTable>
                                 </Table>
+                                </div>
                             )
                     }
                 </CardContent>
