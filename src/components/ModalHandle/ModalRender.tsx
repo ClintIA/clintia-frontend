@@ -16,7 +16,6 @@ import {registerDoctor, updateDoctor} from "@/services/doctorService.ts";
 import {createExam, updateExam} from "@/services/tenantExamService.tsx";
 import RegisterTenantExam, {IExam} from "@/components/AdminTenantExam/RegisterTenantExam.tsx";
 import {IMarketing} from "@/types/Marketing.ts";
-import AdminLead from "@/components/AdminLead/AdminLead.tsx";
 import {Exams} from "@/pages/admin/AdminTenantExams.tsx";
 import {CreateLeadDTO} from "@/types/dto/CreateLead.ts";
 
@@ -41,7 +40,6 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
     const [modalContent,setModalContent] = useState<ModalType>(ModalType.newPatient)
     const [patientData, setPatientData] = useState<BookingConfirmationState>({} as BookingConfirmationState)
     const [currentStep, setCurrentStep] = useState(0)
-    const [lead, setLead ] = useState<CreateLeadDTO>()
     const setStep = (step: number) => {
         setCurrentStep(step)
     }
@@ -52,9 +50,6 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
     const openModal = (type: ModalType, patientData?: BookingConfirmationState) => {
         if(patientData) {
             setPatientData(patientData)
-        }
-        if(data) {
-            setLead(data)
         }
         setModalContent(type)
         setOpen(true)
@@ -202,8 +197,6 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
                 return (<RegisterTenantExam title={title} isUpdate={submitUpdateExam} dadosIniciais={data} />)
             case 'newExam':
                 return(<RegisterTenantExam title={title} isNewExam={submitNewExam}/>)
-            case 'newLead':
-                return(<AdminLead leadInfo={lead} title={title}/>)
         }
     }
     return (
