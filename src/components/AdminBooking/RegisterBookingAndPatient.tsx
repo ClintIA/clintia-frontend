@@ -10,7 +10,6 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {DadosPaciente} from "@/components/AdminPatient/RegisterPatient.tsx";
 import {listDoctorByExam, listTenantExam} from "@/services/tenantExamService.tsx";
 import {useAuth} from "@/hooks/auth.tsx";
-import Loading from "@/components/Loading.tsx";
 import { validarTelefone} from "@/lib/utils.ts";
 import {getPatientByPhoneAndTenant, updatePatient} from "@/services/patientService.tsx";
 import {ModalType} from "@/types/ModalType.ts";
@@ -60,7 +59,6 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
     const [phone, setPhone] = useState<string>('')
     const [erro, setErro] = useState<string | null>(null)
     const [doctors, setDoctors] = useState<Doctor[] | undefined>(undefined)
-    const [loading, setLoading] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [notFoundPhone, setNotFoundPhone] = useState<boolean>(false)
     const [showForm, setShowForm] = useState<boolean>(false)
@@ -111,7 +109,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
         const fetchExams = async () => {
             try {
                 if(auth.tenantId) {
-                    setLoading(true)
+                    setIsLoading(true)
                     const result = await listTenantExam(auth.tenantId)
                     if(result?.data.data.length === 0 ) {
                         setErro('Não possui procedimentos cadastrados')
@@ -127,7 +125,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                 setErro("Não possível carregar os procedimentos")
                 console.error(error)
             } finally {
-                setLoading(false)
+                setIsLoading(false)
             }
         }
         fetchExams().then()
@@ -253,7 +251,6 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
         try {
             if (auth.tenantId) {
                 setIsLoading(true)
-
                 const response = await createRegisterLead({
                     name: patientData.full_name,
                     phoneNumber: patientData?.phone?.replace(/\D/g, '') || undefined,
@@ -291,7 +288,6 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
            setErro('Por favor, Selecione a data do agendamento')
            return
        }
-
        setErro(null)
        dadosBooking.examId = parseInt(selectedExame)
        dadosBooking.patientId = patientData?.id;
@@ -312,7 +308,6 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
        const doctorSelected = doctors?.find(e => e.id === dadosBooking.doctorId);
 
            if (auth.tenantId && auth.userId && patientData) {
-
                const bookingDados = {
                    ...dadosBooking,
                    examDate: createDate(dadosBooking.examDate),
@@ -349,7 +344,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
 
                        }
                        try {
-                           setLoading(true)
+                           setIsLoading(true)
                            const result = await submitBookintWithPatient(bookingWithPatient, auth.tenantId)
                            if (result.status === 201 && handleModalMessage) {
                                handleModalMessage(ModalType.bookingConfirmation, result?.data.data.data)
@@ -359,7 +354,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                        } catch (error) {
                            setErro('Erro ao cadastrar novo paciente' + error)
                        } finally {
-                           setLoading(false)
+                           setIsLoading(false)
                        }
                    }
                }
@@ -369,7 +364,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                    patientData.canal = selectedCanal
                    patientData.contactChannel = selectedChannelContact
                    try {
-                       setLoading(true)
+                       setIsLoading(true)
                        const result = await submitBookingExam(bookingDados, auth.tenantId, patientData)
                        if (result.status !== 201) {
                            setErro('Erro ao salvar paciente, verifique os dados')
@@ -387,7 +382,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                    } catch (error) {
                        console.error(error)
                    } finally {
-                       setLoading(false)
+                       setIsLoading(false)
                    }
                    setDadosBooking({
                        examDate: '',
@@ -398,10 +393,6 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                    })
                }
              }
-           }
-
-           if (loading) {
-               return <Loading />
            }
 
        return (
@@ -426,7 +417,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                height={8}
                                color="#051E32"
                                className="mb-8"
-                               indeterminate={isLoading}
+                               indeterminate={true}
                            />
                        </div>)}
                    </CardHeader>
@@ -647,11 +638,11 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                )}
                            </div>
                            { showForm && (<div className="flex justify-between mt-8 gap-4">
-                               <Button className="bg-oxfordBlue text-white w-70" type="button"
+                               <Button disabled={!!dadosBooking.examDate} className="bg-oxfordBlue text-white w-70" type="button"
                                        onClick={handleSubmitLead}>
                                    Registrar Contato
                                </Button>
-                               <Button disabled={!selectedExame} className="bg-oxfordBlue text-white w-70" type="submit">
+                               <Button disabled={!dadosBooking.examDate} className="bg-oxfordBlue text-white w-70" type="submit">
                                    Salvar Agendamento
                                </Button>
                            </div>)}
