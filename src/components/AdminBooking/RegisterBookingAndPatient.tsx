@@ -254,11 +254,15 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
             if (auth.tenantId) {
                 setIsLoading(true)
 
-                const response = await createRegisterLead({...patientData,
-                    phoneNumber: patientData?.phone?.replace(/\D/g, ''),
+                const response = await createRegisterLead({
+                    name: patientData.full_name,
+                    phoneNumber: patientData?.phone?.replace(/\D/g, '') || undefined,
+                    indication_name: patientData.indication_name || undefined,
                     scheduledDoctorId: parseInt(selectedDoctor) || undefined,
+                    diagnosis: patientData.diagnostic || undefined,
                     examId: parseInt(selectedExame) || undefined,
                     canal: selectedCanal || undefined,
+                    scheduledDate: dadosBooking.examDate || undefined,
                     contactChannel: selectedChannelContact
                 }, auth.tenantId)
                 if (response.status === 201) {
@@ -345,6 +349,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
 
                        }
                        try {
+                           setLoading(true)
                            const result = await submitBookintWithPatient(bookingWithPatient, auth.tenantId)
                            if (result.status === 201 && handleModalMessage) {
                                handleModalMessage(ModalType.bookingConfirmation, result?.data.data.data)
@@ -353,6 +358,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                            return
                        } catch (error) {
                            setErro('Erro ao cadastrar novo paciente' + error)
+                       } finally {
+                           setLoading(false)
                        }
                    }
                }
@@ -362,6 +369,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                    patientData.canal = selectedCanal
                    patientData.contactChannel = selectedChannelContact
                    try {
+                       setLoading(true)
                        const result = await submitBookingExam(bookingDados, auth.tenantId, patientData)
                        if (result.status !== 201) {
                            setErro('Erro ao salvar paciente, verifique os dados')
@@ -378,6 +386,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
 
                    } catch (error) {
                        console.error(error)
+                   } finally {
+                       setLoading(false)
                    }
                    setDadosBooking({
                        examDate: '',
