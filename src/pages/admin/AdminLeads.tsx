@@ -150,7 +150,7 @@ const AdminLeads: React.FC = () => {
             ))}</TableCell>
             <TableCell className="text-oxfordBlue capitalize">{lead.indication_name || 'Sem Registro'}</TableCell>
             <TableCell className="text-oxfordBlue capitalize">{lead.contactChannel || 'Sem Registro'}</TableCell>
-            <TableCell className="text-oxfordBlue">{lead.scheduledDate ? format(lead.scheduledDate, "dd/MM/yyyy", {locale: ptBR}) : 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue">{lead.scheduledDate ? format(lead.scheduledDate, "dd/MM/yyyy HH:mm", {locale: ptBR}) : 'Sem Registro'}</TableCell>
             <TableCell className="text-oxfordBlue capitalize">{lead.scheduledDoctor?.fullName || 'Sem Registro'}</TableCell>
             <TableCell className="text-oxfordBlue capitalize">{lead.exam?.exam_name || 'Sem Registro'}</TableCell>
             <TableCell className="text-oxfordBlue capitalize">{lead.diagnosis || 'Sem Registro'}</TableCell>
