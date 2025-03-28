@@ -3,7 +3,7 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {Button} from "@/components/ui/button.tsx"
 import {Input} from "@/components/ui/input.tsx"
 import {Label} from "@/components/ui/label.tsx"
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,} from "@/components/ui/card.tsx"
+import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card.tsx"
 import {AlertCircle} from "lucide-react"
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx"
@@ -65,8 +65,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
     const [notFoundPhone, setNotFoundPhone] = useState<boolean>(false)
     const [showForm, setShowForm] = useState<boolean>(false)
     const [patientData, setPatientData] = useState<DadosPaciente>()
-    const [selectedCanal, setSelectedCanal] = useState<string | undefined>('')
-    const [selectedChannelContact, setSelectedChannelContact] = useState<string | undefined>('')
+    const [selectedCanal, setSelectedCanal] = useState<string | undefined>()
+    const [selectedChannelContact, setSelectedChannelContact] = useState<string | undefined>()
     const [isNewPatient, setIsNewPatient] = useState<boolean>(false)
     const auth = useAuth()
     const navigate = useNavigate();
@@ -232,6 +232,23 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
     const handleSubmitLead = async (e: React.FormEvent) => {
         e.preventDefault()
         setErro(null)
+        if(!patientData?.full_name) {
+            setErro('Por favor, preencha o nome')
+            return
+        }
+        if(!selectedCanal) {
+            setErro('Por favor, selecione um canal de contato')
+            return
+        }
+        if(!selectedChannelContact) {
+            setErro('Por favor, selecione um canal de captação')
+            return
+        }
+        if(!selectedExame) {
+            setErro('Por favor, selecione um procedimento')
+            return
+        }
+
 
         try {
             if (auth.tenantId) {
@@ -379,6 +396,15 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
 
        return (
            <div className="w-full mx-auto mt-10">
+               <Card>
+                   {erro && (
+                       <Alert variant="destructive">
+                           <AlertCircle className="h-4 w-4"/>
+                           <AlertTitle>Erro</AlertTitle>
+                           <AlertDescription>{erro}</AlertDescription>
+                       </Alert>
+                   )}
+               </Card>
                <Card className="w-full">
                    <CardHeader>
                        <CardTitle className="text-xl text-oxfordBlue">{title}</CardTitle>
@@ -621,15 +647,6 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                            </div>)}
                        </form>
                    </CardContent>
-                   <CardFooter>
-                       {erro && (
-                           <Alert variant="destructive">
-                               <AlertCircle className="h-4 w-4"/>
-                               <AlertTitle>Erro</AlertTitle>
-                               <AlertDescription>{erro}</AlertDescription>
-                           </Alert>
-                       )}
-                   </CardFooter>
                </Card>
            </div>
 
