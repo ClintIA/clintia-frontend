@@ -11,7 +11,6 @@ import {ModalType} from "@/types/ModalType.ts";
 import RegisterAdmin from "@/components/AdminRegister/RegisterAdmin.tsx";
 import RegisterDoctor, {IDoctor} from "@/components/AdminDoctor/RegisterDoctor.tsx";
 import {IAdmin} from "@/types/dto/Admin.ts";
-import {registerDoctor, updateDoctor} from "@/services/doctorService.ts";
 import RegisterTenantExam from "@/components/AdminTenantExam/RegisterTenantExam.tsx";
 import {IMarketing} from "@/types/Marketing.ts";
 import {Exams} from "@/pages/admin/AdminTenantExams.tsx";
@@ -105,29 +104,6 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
         }
     }
 
-    const submitNewDoctor = async (doctorData: IDoctor,tenantId: number) => {
-        if(modalMessage) {
-           const result = await registerDoctor(doctorData, tenantId)
-            if (result.status === 201) {
-                modalMessage('Cadastrado Realizado com sucesso')
-                onClose()
-            } else {
-                throw new Error('Não foi possível realizar cadastro: ' + result.message)
-            }
-        }
-    }
-    const submitUpdateDoctor = async (doctorData: IDoctor,tenantId: number) => {
-        if(modalMessage) {
-            const result = await updateDoctor(doctorData,tenantId)
-            if (result.status === 200) {
-                modalMessage('Cadastrado atualizado com sucesso')
-                onClose()
-            } else {
-                throw new Error('Não foi possível atualizar cadastro: ' + result.message)
-            }
-        }
-    }
-
     const renderModalContent = () => {
         switch (modalContent) {
             case 'booking':
@@ -142,9 +118,9 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
             case 'bookingConfirmation':
                 return(<BookingConfirmation setStep={setStep} dadosBooking={patientData} onNewBooking={openModal} />)
             case 'newDoctorAdmin':
-                return(<RegisterDoctor title={title} isDoctor={submitNewDoctor} />)
+                return(<RegisterDoctor title={title} />)
             case 'editDoctorAdmin':
-                return(<RegisterDoctor title={title} dadosIniciais={data} isUpdate={submitUpdateDoctor} />)
+                return(<RegisterDoctor title={title} dadosIniciais={data} />)
             case 'newAdmin':
                 return(<RegisterAdmin title={title} />)
             case 'editAdmin':

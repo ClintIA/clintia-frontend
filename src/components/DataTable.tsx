@@ -74,7 +74,6 @@ const DataTable = <T,>({ dataTable, openModalEdit, deleteData, openModalBooking,
                                                 <span className="text-sm">Agendar</span>
                                             </Button>
                                         )}
-                                        {!Object.prototype.hasOwnProperty.call(data, 'CRM') && (
                                             <Button
                                                 onClick={() => deleteData(data.id)}
                                                 className="w-full bg-oxfordBlue text-white"
@@ -82,7 +81,7 @@ const DataTable = <T,>({ dataTable, openModalEdit, deleteData, openModalBooking,
                                                 <Trash2 className="mr-1 h-4 w-4" />
                                                 <span className="text-sm">Excluir</span>
                                             </Button>
-                                        )}
+
                                     </div>
                                 </PopoverContent>
                             </Popover>)}
