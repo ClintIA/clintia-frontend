@@ -6,5 +6,7 @@ export interface IAdmin {
     cpf?: string
     phone?: string
     role?: string
+    occupation?: string;
+    CRM?: string;
     created_at?: string
 }

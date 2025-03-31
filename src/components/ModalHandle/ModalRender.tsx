@@ -8,13 +8,10 @@ import {updatePatient} from "@/services/patientService.tsx";
 import RegisterBookingAndPatient from "@/components/AdminBooking/RegisterBookingAndPatient.tsx";
 import BookingConfirmation, {BookingConfirmationState} from "@/components/AdminBooking/BookingConfirmation.tsx";
 import {ModalType} from "@/types/ModalType.ts";
-import {registerAdmin, updateAdmin} from "@/services/adminsService.tsx";
 import RegisterAdmin from "@/components/AdminRegister/RegisterAdmin.tsx";
 import RegisterDoctor, {IDoctor} from "@/components/AdminDoctor/RegisterDoctor.tsx";
 import {IAdmin} from "@/types/dto/Admin.ts";
-import {registerDoctor, updateDoctor} from "@/services/doctorService.ts";
-import {createExam, updateExam} from "@/services/tenantExamService.tsx";
-import RegisterTenantExam, {IExam} from "@/components/AdminTenantExam/RegisterTenantExam.tsx";
+import RegisterTenantExam from "@/components/AdminTenantExam/RegisterTenantExam.tsx";
 import {IMarketing} from "@/types/Marketing.ts";
 import {Exams} from "@/pages/admin/AdminTenantExams.tsx";
 import {CreateLeadDTO} from "@/types/dto/CreateLead.ts";
@@ -89,18 +86,7 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
             }
     }
 
-    const submitNewAdmin = async (adminData: IAdmin,tenantId: number) => {
-        if(modalMessage) {
-            const result = await registerAdmin(adminData,tenantId)
 
-            if (result.status === 201) {
-                modalMessage('Cadastrado Realizado com sucesso')
-                onClose()
-            } else {
-                throw new Error('Não foi possível realizar cadastro: ' + result.message)
-            }
-        }
-    }
     const submitBookingExam = async (bookingDados: DadosBooking, tenantId: number, patientData?: DadosPaciente) => {
         try {
             if (modalNewBookingConfirmation) {
@@ -117,61 +103,7 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
             console.log(error)
         }
     }
-    const submitUpdateAdmin = async (adminData: IAdmin,tenantId: number) => {
-        if (modalMessage) {
-            await updateAdmin(adminData,tenantId)
-                .then(result => {
-                    if (result.status === 200) {
-                        modalMessage('Dados Atualizados com sucesso')
-                        onClose()
-                    } else {
-                        throw new Error('Não foi possível atualizar dados' + result.message)
-                    }
-                }).catch(error => {console.log(error)})
-        }
-    }
-    const submitNewDoctor = async (doctorData: IDoctor,tenantId: number) => {
-        if(modalMessage) {
-           const result = await registerDoctor(doctorData, tenantId)
-            if (result.status === 201) {
-                modalMessage('Cadastrado Realizado com sucesso')
-                onClose()
-            } else {
-                throw new Error('Não foi possível realizar cadastro: ' + result.message)
-            }
-        }
-    }
-    const submitUpdateDoctor = async (doctorData: IDoctor,tenantId: number) => {
-        if(modalMessage) {
-            const result = await updateDoctor(doctorData,tenantId)
-            if (result.status === 200) {
-                modalMessage('Cadastrado atualizado com sucesso')
-                onClose()
-            } else {
-                throw new Error('Não foi possível atualizar cadastro: ' + result.message)
-            }
-        }
-    }
-    const submitNewExam = async (examData: IExam, tenantId: number) => {
-        if(modalMessage) {
-            const result =  await createExam(examData, tenantId)
-            modalMessage('Procedimento cadastrado com sucesso')
-            return result
-        }
-    }
-    const submitUpdateExam = async (examData: IExam, tenantId: number) => {
-        if (modalMessage) {
-            await updateExam({...examData, doctorPrice: Number(examData.doctorPrice)}, tenantId)
-                .then((result) => {
-                    if (result.data.status === "success") {
-                        modalMessage('Procedimento Atualizado com sucesso')
-                        onClose()
-                    } else {
-                        return new Error('Não foi possível atualizar exame' + result.message)
-                    }
-                }).catch(error => {console.log(error)})
-        }
-    }
+
     const renderModalContent = () => {
         switch (modalContent) {
             case 'booking':
@@ -186,17 +118,17 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
             case 'bookingConfirmation':
                 return(<BookingConfirmation setStep={setStep} dadosBooking={patientData} onNewBooking={openModal} />)
             case 'newDoctorAdmin':
-                return(<RegisterDoctor title={title} isDoctor={submitNewDoctor} />)
+                return(<RegisterDoctor title={title} />)
             case 'editDoctorAdmin':
-                return(<RegisterDoctor title={title} dadosIniciais={data} isUpdate={submitUpdateDoctor} />)
+                return(<RegisterDoctor title={title} dadosIniciais={data} />)
             case 'newAdmin':
-                return(<RegisterAdmin title={title} isAdmin={submitNewAdmin} />)
+                return(<RegisterAdmin title={title} />)
             case 'editAdmin':
-                return(<RegisterAdmin title={title} dadosIniciais={data} isUpdate={submitUpdateAdmin} />)
+                return(<RegisterAdmin title={title} dadosIniciais={data} />)
             case 'editExam':
-                return (<RegisterTenantExam title={title} isUpdate={submitUpdateExam} dadosIniciais={data} />)
+                return (<RegisterTenantExam title={title} dadosIniciais={data} />)
             case 'newExam':
-                return(<RegisterTenantExam title={title} isNewExam={submitNewExam}/>)
+                return(<RegisterTenantExam title={title}/>)
         }
     }
     return (

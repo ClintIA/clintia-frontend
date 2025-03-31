@@ -11,11 +11,11 @@ import {listTenantExam} from "@/services/tenantExamService.tsx";
 import {MultiSelect} from "@/components/ui/MultiSelect.tsx";
 import {Switch} from "@/components/ui/switch.tsx";
 import {validarCPF, validarTelefone} from "@/lib/utils.ts";
+import {registerDoctor, updateDoctor} from "@/services/doctorService.ts";
+import {toast} from "@/hooks/use-toast.ts";
 
 interface RegisterDoctorProps {
     dadosIniciais?: Partial<IDoctor>
-    isUpdate?: (adminData: IDoctor, tenant: number) => Promise<void>
-    isDoctor?: (adminData: IDoctor, tenant: number) => Promise<void>
     title: string
 }
 
@@ -32,11 +32,11 @@ export interface IDoctor {
     occupation?: string;
     sessionToken?: string;
     created_at?: string;
-    tenant?: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
+    tenant?: any[];
     exams?: number[];
 }
 
-const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isUpdate, isDoctor}: RegisterDoctorProps) => {
+const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais}: RegisterDoctorProps) => {
 
     const [doctorData, setDoctorData] = useState<IDoctor>({
         fullName: '',
@@ -97,6 +97,45 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
     const handleSelectedExames = (exames: number[]) => {
         setSelectedExame(exames)
     }
+    const submitNewDoctor = async (doctorData: IDoctor,tenantId: number) => {
+        await registerDoctor(doctorData, tenantId)
+            .then((result) => {
+                console.log(result.status)
+                if(result.status == "error") {
+                    setErro(result.message)
+                    return
+                }
+                if (result.data.status == "success") {
+                    toast({
+                        title: 'Clintia',
+                        description: 'Profissional salvo com sucesso'
+                    })
+                    window.location.reload()
+                }
+            }).catch(error => {
+                setErro('Erro ao salvar profissional, verifique os dados: ' + error.message)
+            })
+    }
+    const submitUpdateDoctor = async (doctorData: IDoctor,tenantId: number) => {
+        await updateDoctor(doctorData,tenantId)
+            .then((result) => {
+                console.log(result)
+                if (result.data.status === "success") {
+                    toast({
+                        title: 'Clintia',
+                        description: result.message
+                    })
+                    window.location.reload()
+                } else {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Clintia',
+                        description: 'Erro ao atualizar profissional, verifique os dados: ' + result.data.message
+                    })
+                }
+            }).catch(error => {console.log(error)})
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setErro(null)
@@ -109,7 +148,6 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
             setErro('Por favor, preencha todos os campos')
             return
         }
-
         if (!validarTelefone(doctorData.phone)) {
             setErro('Telefone inválido')
             return
@@ -121,27 +159,15 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
         try {
             if(auth.tenantId) {
 
-                if(isUpdate) {
-                    await isUpdate(doctorData, auth.tenantId)
+                if(dadosIniciais) {
+                    await submitUpdateDoctor(doctorData, auth.tenantId)
                         .catch((error) => console.log(error))
-
                 }
-                if(isDoctor) {
-                    await isDoctor({...doctorData, exams: selectedExame}, auth.tenantId)
+                if(!dadosIniciais) {
+                    await submitNewDoctor({...doctorData, exams: selectedExame}, auth.tenantId)
                         .catch((error) => console.log(error))
-
                 }
 
-                setDoctorData({
-                    fullName: '',
-                    phone: '',
-                    CRM: '',
-                    cpf: '',
-                    occupation: '',
-                    cep: '',
-                    email: '',
-                    cnpj: ''
-                })
                 setSelectedExame([])
                 setAddExam(false)
                 setExamesIDs([])
@@ -339,10 +365,10 @@ const RegisterDoctor: React.FC<RegisterDoctorProps> = ({title,dadosIniciais, isU
                         )}
 
                         <div className="flex justify-end mt-6">
-                            {isDoctor && (
+                            {!dadosIniciais && (
                                 <Button className="bg-oxfordBlue text-white" type="submit">Cadastrar</Button>
                             )}
-                            {isUpdate && (
+                            {dadosIniciais && (
                                 <Button className="bg-oxfordBlue text-white" type="submit">Atualizar
                                 </Button>
                             )}
