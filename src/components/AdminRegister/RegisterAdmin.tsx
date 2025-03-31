@@ -10,15 +10,15 @@ import {validarCPF, validarEmail, validarTelefone} from "@/lib/utils.ts";
 import {IAdmin} from "@/types/dto/Admin.ts";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {roleOptions} from "@/lib/optionsFixed.ts";
+import {registerAdmin, updateAdmin} from "@/services/adminsService.tsx";
+import {toast} from "@/hooks/use-toast.ts";
 
 interface RegisterAdminProps {
     dadosIniciais?: Partial<IAdmin>
-    isUpdate?: (adminData: IAdmin, tenant: number) => Promise<void>
-    isAdmin?: (adminData: IAdmin, tenant: number) => Promise<void>
     title: string
 }
 
-const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUpdate, isAdmin}: RegisterAdminProps) => {
+const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais}: RegisterAdminProps) => {
 
     const [adminData, setAdminData] = useState<IAdmin>({
         fullName: '',
@@ -36,10 +36,47 @@ const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUp
         const { name, value } = e.target
         setAdminData(prev => ({ ...prev, [name]: value }))
     }
+    const submitNewAdmin = async (adminData: IAdmin,tenantId: number) => {
+            await registerAdmin(adminData,tenantId)
+                .then((result) => {
+                    console.log(result)
+                    if (result.status === "success") {
+                        toast({
+                            title: 'Clintia',
+                            description: 'Administrador salvo com sucesso'
+                        })
+                        window.location.reload()
+                    } else {
+                        toast({
+                            variant: 'destructive',
+                            title: 'Clintia',
+                            description: 'Erro ao salvar Administrador, verifique os dados: ' + result.message
+                        })
+                    }
+                }).catch(error => {console.log(error)})
+    }
+    const submitUpdateAdmin = async (adminData: IAdmin,tenantId: number) => {
+            await updateAdmin(adminData,tenantId)
+                .then((result) => {
+                    console.log(result)
+                    if (result.status === "success") {
+                        toast({
+                            title: 'Clintia',
+                            description: 'Administrador atualizado com sucesso'
+                        })
+                        window.location.reload()
+                    } else {
+                        toast({
+                            variant: 'destructive',
+                            title: 'Clintia',
+                            description: 'Erro ao salvar Administrador, verifique os dados: ' + result.message
+                        })
+                    }
+                }).catch(error => {console.log(error)})
+    }
 
     useEffect(() => {
         if(dadosIniciais) {
-
             setAdminData(prevDados => ({
                 ...prevDados,
                 ...dadosIniciais
@@ -77,12 +114,12 @@ const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUp
 
         try {
             if(auth.tenantId) {
-                if(isAdmin) {
-                    await isAdmin(adminData,auth.tenantId)
+                if(!dadosIniciais) {
+                    await submitNewAdmin(adminData,auth.tenantId)
                 }
 
-                if(isUpdate) {
-                    await isUpdate(adminData,auth.tenantId)
+                if(dadosIniciais) {
+                    await submitUpdateAdmin(adminData,auth.tenantId)
                 }
                 setAdminData({
                     fullName: '',
@@ -215,10 +252,10 @@ const RegisterAdmin: React.FC<RegisterAdminProps> = ({title, dadosIniciais, isUp
 
                            </div>
                            <div className="flex justify-end mt-6">
-                               {isAdmin && (
+                               {!dadosIniciais && (
                                    <Button className="bg-oxfordBlue text-white" type="submit">Cadastrar</Button>
                                )}
-                               {isUpdate && (
+                               {dadosIniciais && (
                                    <Button className="bg-oxfordBlue text-white" type="submit">Atualizar
                                    </Button>
                                )}                           </div>

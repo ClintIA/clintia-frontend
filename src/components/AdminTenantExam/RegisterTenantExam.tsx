@@ -11,6 +11,8 @@ import {MultiSelect} from "@/components/ui/MultiSelect.tsx";
 import {listDoctors} from "@/services/doctorService.ts";
 import {IDoctor} from "@/components/AdminDoctor/RegisterDoctor.tsx";
 import {examOptions} from "@/lib/optionsFixed.ts";
+import {createExam, updateExam} from "@/services/tenantExamService.tsx";
+import {toast} from "@/hooks/use-toast.ts";
 
 export interface IExam {
     id?: number
@@ -24,10 +26,8 @@ export interface IExam {
 interface RegisterExamProps {
     dadosIniciais?: Partial<Exams>
     title?: string
-    isUpdate?: (examData: IExam, tenant: number) => Promise<void>
-    isNewExam?: (examData: IExam, tenant: number) => Promise<void>
 }
-const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, isUpdate, isNewExam}) => {
+const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title}) => {
 
     const [examData, setExamData] = useState<IExam>({
         exam_name: '',
@@ -43,7 +43,6 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, i
     const [doctorFixedPrice, setDoctorFixedPrice] = useState<string>("");
     const [doctorPercentage, setDoctorPercentage] = useState<string>("");
     const auth = useAuth()
-
     useEffect(() => {
         const getDoctorsId = () => {
             if(dadosIniciais) {
@@ -81,7 +80,39 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, i
     fetchDoctors().then()
     }, [fetchDoctors]);
 
+    const submitNewExam = async (examData: IExam, tenantId: number) => {
+               await createExam(examData, tenantId)
+                  .then((result) => {
+                      if (result.status === "success") {
+                          toast({
+                              title: 'Clintia',
+                              description: 'Procedimento registrado com sucesso'
+                          })
+                          window.location.reload()
+                      } else {
+                          setErro('Erro ao registrar procedimento'+ result.message)
+                      }
+                  }).catch(error => {console.log(error)})
+    }
+    const submitUpdateExam = async (examData: IExam, tenantId: number) => {
 
+        await updateExam({...examData, doctorPrice: Number(examData.doctorPrice)}, tenantId)
+                .then((result) => {
+                    if (result.status === "success") {
+                        toast({
+                            title: 'Clintia',
+                            description: 'Procedimento atualizado com sucesso'
+                        })
+                        window.location.reload()
+                    } else {
+                        toast({
+                            variant: 'destructive',
+                            title: 'Clintia',
+                            description: 'Erro ao salvar procedimento, verifique os dados: ' + result.message
+                        })
+                    }
+                }).catch(error => {console.log(error)})
+    }
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const { name, value } = e.target
         setExamData(prev => ({ ...prev, [name]: value }))
@@ -112,16 +143,15 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, i
             doctors: selectedDoctors,
         }
 
-        if(isUpdate && auth.tenantId) {
-
-                await isUpdate(newExam, auth.tenantId).catch((error) => {
+        if(auth.tenantId) {
+                await submitUpdateExam(newExam, auth.tenantId).catch((error) => {
                     setErro(error)
                     console.log(error)
                 })
             return
         }
-        if(isNewExam && auth.tenantId) {
-            await isNewExam(newExam, auth.tenantId).catch((error) => {
+        if(auth.tenantId) {
+            await submitNewExam(newExam, auth.tenantId).catch((error) => {
                 setErro(error)
                 console.log(error)
             })
@@ -253,9 +283,9 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title, i
                         </div>
 
                         <div className="flex justify-end mt-6">
-                            {isNewExam && (
+                            {!dadosIniciais && (
                                 <Button className="bg-oxfordBlue text-white" type="submit">Cadastrar Procedimento</Button>)}
-                            {isUpdate && (
+                            {dadosIniciais && (
                                 <Button className="bg-oxfordBlue text-white" type="submit">Atualizar Procedimento</Button>)}
 
                         </div>
