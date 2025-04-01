@@ -253,7 +253,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                 setIsLoading(true)
                 const response = await createRegisterLead({
                     name: patientData.full_name,
-                    phoneNumber: patientData?.phone?.replace(/\D/g, '') || undefined,
+                    phoneNumber: phone?.replace(/\D/g, '') || undefined,
                     indication_name: patientData.indication_name || undefined,
                     scheduledDoctorId: parseInt(selectedDoctor) || undefined,
                     diagnosis: patientData.diagnostic || undefined,
@@ -316,7 +316,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                }
                const createLead: CreateLeadDTO = {
                    name: patientData.full_name,
-                   phoneNumber: patientData.phone?.replace(/\D/g, '') || undefined,
+                   phoneNumber: phone?.replace(/\D/g, ''),
                    canal: patientData.canal || undefined,
                    indication_name: patientData.indication_name || undefined,
                    contactChannel: patientData.contactChannel || undefined,
