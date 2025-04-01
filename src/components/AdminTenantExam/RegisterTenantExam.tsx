@@ -6,7 +6,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {AlertCircle} from "lucide-react";
 import {useAuth} from "@/hooks/auth.tsx";
-import {Exams} from "@/pages/admin/AdminTenantExams.tsx";
+import { Exams} from "@/pages/admin/AdminTenantExams.tsx";
 import {MultiSelect} from "@/components/ui/MultiSelect.tsx";
 import {listDoctors} from "@/services/doctorService.ts";
 import {IDoctor} from "@/components/AdminDoctor/RegisterDoctor.tsx";
@@ -23,6 +23,7 @@ export interface IExam {
     doctors?: number[]
     createdAt?: Date
 }
+
 interface RegisterExamProps {
     dadosIniciais?: Partial<Exams>
     title?: string
@@ -83,7 +84,8 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title}) 
     const submitNewExam = async (examData: IExam, tenantId: number) => {
                await createExam(examData, tenantId)
                   .then((result) => {
-                      if (result.status === "success") {
+
+                      if (result.data.status === "success") {
                           toast({
                               title: 'Clintia',
                               description: 'Procedimento registrado com sucesso'
@@ -98,7 +100,7 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title}) 
 
         await updateExam({...examData, doctorPrice: Number(examData.doctorPrice)}, tenantId)
                 .then((result) => {
-                    if (result.status === "success") {
+                    if (result.data.status === "success") {
                         toast({
                             title: 'Clintia',
                             description: 'Procedimento atualizado com sucesso'
@@ -139,23 +141,25 @@ const RegisterTenantExam: React.FC<RegisterExamProps> = ({dadosIniciais,title}) 
 
         const newExam = {...examData,
             price: examData.price.replace(',', '.'),
-            doctorPrice: doctorFinalPrice,
+            doctorPrice: doctorFinalPrice || 0,
             doctors: selectedDoctors,
         }
 
         if(auth.tenantId) {
+            if(dadosIniciais) {
                 await submitUpdateExam(newExam, auth.tenantId).catch((error) => {
                     setErro(error)
                     console.log(error)
                 })
-            return
-        }
-        if(auth.tenantId) {
-            await submitNewExam(newExam, auth.tenantId).catch((error) => {
-                setErro(error)
-                console.log(error)
-            })
-            return
+                return
+            }
+            if(!dadosIniciais) {
+                await submitNewExam(newExam, auth.tenantId).catch((error) => {
+                    setErro(error)
+                    console.log(error)
+                })
+                return
+            }
         }
     }
 
