@@ -1,18 +1,7 @@
-import { addDays, format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import { CalendarIcon } from 'lucide-react'
 import {useCallback, useEffect, useState} from 'react'
-import { DateRange } from 'react-day-picker'
 import { Bar, BarChart, Cell, Funnel, FunnelChart, LabelList, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
 import {
   Table,
   TableBody,
@@ -25,33 +14,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {useAuth} from "@/hooks/auth.tsx";
 import {
   countChannel, countPatientExamWithFilters, countPatientWithFilters,
-  countTotalInvoice, countTotalInvoiceDoctor,
-  MarketingFilters
+  countTotalInvoice, countTotalInvoiceDoctor, findAllMetrics, getBudgetCanal,
+  MarketingFilters, MarketingMetricsResponse
 } from "@/services/marketingService.ts";
+import {Label} from "@/components/ui/label.tsx";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
+import {months} from "@/lib/optionsFixed.ts";
 
 
-const marketingMetricData = [
-  { name: 'CPL', total: 1230 },
-  { name: 'CPC', total: 751 },
-  { name: 'Ticket Médio', total: 471 },
-]
-
-const investmentData = [
-  { name: 'Investimento', total: 432 },
-  { name: 'ROAS', total: 1230 },
-]
-
-
-
-
-const funnelData = [
-  { name: 'Cliques', value: 500, fill: '#FFBB28' },
-  { name: 'Leads', value: 400, fill: '#FF8042' },
-  { name: 'Agendamentos', value: 300, fill: '#0088FE' },
-  { name: 'Realizados', value: 100, fill: '#00C49F' },
-]
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
+const COLORS = ['#0D47A3', '#90CAF9', '#2196F3', '#0D47A1', '#0D47A4']
 interface ChannelChart {
   name: string
   total: number
@@ -61,34 +32,65 @@ interface ChannelChart {
   percent?: number
 }
 export function AdminDashboard() {
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(2024, 0, 1),
-    to: addDays(new Date(2024, 0, 1), 20),
-  })
 
 
   const [totalInvoiceDoctor, setTotalInvoiceDoctor] = useState<ChannelChart[]>([])
+  const [totalBudget, setTotalBudget] = useState(0)
   const [exams, setExam] = useState<ChannelChart[]>()
   const [examsRevenue, setExamsRevenue] = useState<ChannelChart[]>()
   const [totalDoctorInvoice, setTotalDoctorInvoice] = useState(0)
   const [totalPatient, setTotalPatient] = useState(0)
   const [totalExams, setTotalExams] = useState(0)
+  const [month,setMonth] = useState<number>(new Date().getMonth()+1)
   const [totalInvoice, setTotalInvoice] = useState(0)
-  const [canalMarketing, setCanalMarketing] = useState<ChannelChart[]>([])
-  const auth = useAuth()
-  const fetchCountPatient = useCallback(async () => {
-    if (auth.tenantId) {
-      const result = await countChannel(auth.tenantId)
-      if(result.data) {
-        setCanalMarketing(result.data.data.listChannelPerPatient)
+  const [metricData, setMetricData] = useState<MarketingMetricsResponse>()
+  const [canalMarketingPatient, setCanalMarketingPatient] = useState<ChannelChart[]>([])
+  const [canalMarketingExam, setCanalMarketingExam] = useState<ChannelChart[]>([])
 
+  const auth = useAuth()
+  const fetchCountPatientByChannel = useCallback(async (filters: MarketingFilters) => {
+    if (auth.tenantId) {
+      const result = await countChannel(filters, auth.tenantId)
+      if(result.data) {
+        setCanalMarketingPatient(result.data.data.listChannelPerPatient)
+        setCanalMarketingExam(result.data.data.listChannelPerExam)
       }
     }
   },[auth.tenantId])
+  const marketingMetricData = [
+    { name: 'CPL', total: metricData?.data.CPL },
+    { name: 'CPC', total: metricData?.data.CPC },
+    { name: 'Ticket Médio', total: metricData?.data.averageTicket },
+  ]
 
+  const investmentData = [
+    { name: 'Investimento', total: totalBudget },
+    { name: 'ROAS', total: metricData?.data.ROAS },
+  ]
+
+  const funnelData = [
+    { name: 'Cliques', value: metricData?.data.funnel.clicks, fill: '#E3F2FD' },
+    { name: 'Leads', value: metricData?.data.funnel.leads, fill: '#E3F2FD' },
+    { name: 'Agendamentos', value: metricData?.data.funnel.appointments, fill: '#2196F3' },
+    { name: 'Realizados', value: metricData?.data.funnel.completed, fill: '#0D47A1' },
+  ]
+  const fetchBudget = useCallback(async () => {
+    if(auth.tenantId) {
+      await getBudgetCanal(auth.tenantId).
+      then(
+          (result) => {
+            setTotalBudget(result.data.data.budget)
+          }
+      )
+    }
+  },[auth.tenantId])
+
+  useEffect(() => {
+    fetchBudget().then()
+  }, [fetchBudget]);
   const fetchCountPatientExam = useCallback(async (filter: MarketingFilters) => {
     if (auth.tenantId) {
-      filter = { ...filter, attended: 'Sim'}
+      filter = { ...filter, attended: 'Yes'}
       const result = await countTotalInvoice(filter,auth.tenantId)
       setTotalInvoice(result.data.data.generalTotalInvoice)
       setTotalDoctorInvoice(result.data.data.doctorTotalInvoice)
@@ -104,6 +106,14 @@ export function AdminDashboard() {
       setTotalPatient(result.data.data.total)
     }
   },[auth.tenantId])
+  const fetchMetricsData = useCallback(async(filter: MarketingFilters) => {
+    if (auth.tenantId) {
+      const month = filter.month ? filter.month : (new Date().getMonth() + 1);
+      const result = await findAllMetrics(month.toString(),auth.tenantId)
+
+      setMetricData(result.data)
+    }
+  },[auth.tenantId])
   const fetchCountExams = useCallback(async(filter: MarketingFilters) => {
     if (auth.tenantId) {
       const result = await countPatientExamWithFilters(filter,auth.tenantId)
@@ -112,70 +122,51 @@ export function AdminDashboard() {
   },[auth.tenantId])
   const fetchDoctorsTable = useCallback(async(filter: MarketingFilters) => {
     if (auth.tenantId) {
-      filter = { ...filter, attended: 'Sim'}
+      filter = { ...filter, attended: 'Yes'}
       const result = await countTotalInvoiceDoctor(filter,auth.tenantId)
       setTotalInvoiceDoctor(result.data.data.quantityExamDoctor)
     }
   },[auth.tenantId])
 
   useEffect(   () => {
-    fetchDoctorsTable({}).then()
-  }, [fetchDoctorsTable]);
+    fetchMetricsData({ month: month }).then()
+  }, [fetchMetricsData, month]);
+  useEffect(   () => {
+    fetchDoctorsTable({ month: month }).then()
+  }, [fetchDoctorsTable, month]);
+  useEffect(() => {
+    fetchCountPatients({ month: month }).then()
+  }, [fetchCountPatients, month]);
+  useEffect(() => {
+    fetchCountExams({ month: month }).then()
+  }, [fetchCountExams, month]);
+  useEffect(() => {
+    fetchCountPatientByChannel({ month: month }).then()
+  }, [fetchCountPatientByChannel, month]);
 
   useEffect(() => {
-    const filters = {}
-    fetchCountPatients(filters).then()
-  }, [fetchCountPatients]);
-  useEffect(() => {
-    const filters = {}
-    fetchCountExams(filters).then()
-  }, [fetchCountExams]);
-  useEffect(() => {
-    fetchCountPatient().then()
-  }, [fetchCountPatient]);
-
-  useEffect(() => {
-    fetchCountPatientExam({}).then()
-  }, [fetchCountPatientExam]);
+    fetchCountPatientExam({ month: month }).then()
+  }, [fetchCountPatientExam, month]);
   return (
       <div className="w-full p-10 mx-auto">
         <div className="flex items-center justify-between space-y-2">
           <h2 className="text-3xl mb-6 font-bold tracking-tight">Dashboards</h2>
           <div className="flex items-center space-x-2">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                    id="date"
-                    variant={"outline"}
-                    className={` hidden w-[300px] justify-start text-left font-normal`}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4"/>
-                  {date?.from ? (
-                      date.to ? (
-                          <>
-                            {format(date.from, "dd 'de' MMMM", {locale: ptBR})} -{" "}
-                            {format(date.to, "dd 'de' MMMM, yyyy", {locale: ptBR})}
-                          </>
-                      ) : (
-                          format(date.from, "dd 'de' MMMM, yyyy", {locale: ptBR})
-                      )
-                  ) : (
-                      <span>Selecione uma data</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={date?.from}
-                    selected={date}
-                    onSelect={setDate}
-                    numberOfMonths={2}
-                    locale={ptBR}
-                />
-              </PopoverContent>
-            </Popover>
+              <Label htmlFor="w-max month-filter">Selecione um Mês</Label>
+              <Select defaultValue={month?.toString()} value={month.toString()} onValueChange={(e) => setMonth(Number(e))}>
+                <SelectTrigger id="month-filter">
+                  <SelectValue placeholder="Selecione o mês"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Mês</SelectItem>
+                  {months.map((m) => (
+                      <SelectItem key={m.value} value={m.value}>
+                        {m.label}
+                      </SelectItem>
+                  ))}
+                  <span><CalendarIcon/></span>
+                </SelectContent>
+              </Select>
           </div>
         </div>
         <Tabs defaultValue="visao-geral" className="space-y-4">
@@ -188,7 +179,7 @@ export function AdminDashboard() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Faturamento Total
+                    Faturamento Total do Mês
                   </CardTitle>
                   <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -210,7 +201,7 @@ export function AdminDashboard() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Total de Pacientes
+                    Total de Pacientes no Mês
                   </CardTitle>
                   <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -234,7 +225,7 @@ export function AdminDashboard() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Procedimentos realizados
+                    Total de Procedimentos realizados no Mês
                   </CardTitle>
                   <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -284,22 +275,22 @@ export function AdminDashboard() {
                 </CardHeader>
                 <CardContent className="pl-2">
                   <ResponsiveContainer width="100%" height={350}>
-                    <BarChart data={canalMarketing}>
+                    <BarChart data={canalMarketingPatient}>
                       <XAxis
                           dataKey="name"
-                          stroke="#888888"
+                          stroke="#0D47A1"
                           fontSize={10}
                           tickLine={true}
                           axisLine={true}
                       />
                       <YAxis
 
-                          stroke="#888888"
+                          stroke="#0D47A1"
                           fontSize={10}
                           tickLine={true}
                           axisLine={true}
                       />
-                      <Bar dataKey="total" fill="#adfa1d" radius={[4, 4, 0, 0]}/>
+                      <Bar  dataKey="total" fill="#2196F3" radius={[4, 4, 0, 0]}/>
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -320,7 +311,7 @@ export function AdminDashboard() {
                           cy="50%"
                           labelLine={false}
                           outerRadius={70}
-                          fill="#8884d8"
+                          fill="#2196F3"
                           dataKey="percent"
                           label={({name, percent}: {
                             name: string;
@@ -355,9 +346,7 @@ export function AdminDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {exams?.map((exam) => {
-
-                      return (
+                    {exams?.map((exam) => (
                           <TableRow key={exam.profit}>
                             <TableCell className="font-medium">{exam.name}</TableCell>
                             <TableCell>{exam.quantity}</TableCell>
@@ -365,8 +354,8 @@ export function AdminDashboard() {
                             <TableCell>R$ {exam.totalDoctor}</TableCell>
                             <TableCell>R$ {exam.profit?.toFixed(2)}</TableCell>
                           </TableRow>
-                      );
-                    })}
+                      )
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -423,10 +412,7 @@ export function AdminDashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">R$ 7,23</div>
-                  <p className="text-xs text-muted-foreground">
-                    - R$ 2,12 desde o mês passado
-                  </p>
+                  <div className="text-2xl font-bold">{metricData?.data.CPL.toFixed(4)}</div>
                 </CardContent>
               </Card>
               <Card>
@@ -448,10 +434,9 @@ export function AdminDashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">R$ 15,25</div>
-                  <p className="text-xs text-muted-foreground">
-                    - R$ 0,95 desde o mês passado
-                  </p>
+                  <div className="text-2xl font-bold">{
+                    `R$ ${Number(metricData?.data.CAP).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                   }</div>
                 </CardContent>
               </Card>
               <Card>
@@ -472,10 +457,7 @@ export function AdminDashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">R$ 70,50</div>
-                  <p className="text-xs text-muted-foreground">
-                    +5% desde o mês passado
-                  </p>
+                  <div className="text-2xl font-bold">{metricData?.data.ROAS.toFixed(4)}</div>
                 </CardContent>
               </Card>
               <Card>
@@ -497,10 +479,7 @@ export function AdminDashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">2 meses</div>
-                  <p className="text-xs text-muted-foreground">
-                    +20% desde o ano passado
-                  </p>
+                  <div className="text-2xl font-bold">{metricData?.data.LTV.toFixed(5)}</div>
                 </CardContent>
               </Card>
             </div>
@@ -511,21 +490,21 @@ export function AdminDashboard() {
                 </CardHeader>
                 <CardContent className="pl-2">
                   <ResponsiveContainer width="100%" height={350}>
-                    <BarChart data={canalMarketing}>
+                    <BarChart data={canalMarketingExam}>
                       <XAxis
                           dataKey="name"
-                          stroke="#888888"
+                          stroke="#0D47A1"
                           fontSize={12}
                           tickLine={true}
                           axisLine={true}
                       />
                       <YAxis
-                          stroke="#888888"
+                          stroke="#0D47A1"
                           fontSize={12}
                           tickLine={true}
                           axisLine={true}
                       />
-                      <Bar dataKey="total" fill="#adfa1d" radius={[4, 4, 0, 0]}/>
+                      <Bar dataKey="total" fill="#2196F3" radius={[4, 4, 0, 0]}/>
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -536,14 +515,16 @@ export function AdminDashboard() {
                 </CardHeader>
                 <CardContent className="pl-2">
                   <ResponsiveContainer width="100%" height={350}>
-                    <FunnelChart width={730} height={250}>
+                    <FunnelChart width={700} height={250}>
                       <Tooltip/>
                       <Funnel
                           dataKey="value"
                           data={funnelData}
+                          labelLine={true}
                           isAnimationActive
                       >
-                        <LabelList position="right" fill="#000" stroke="none" dataKey="name"/>
+                        <LabelList  position="right" fill="#000" stroke="none" dataKey="value"/>
+                        <LabelList  position="left" fill="#000" stroke="none" dataKey="name"/>
                       </Funnel>
                     </FunnelChart>
                   </ResponsiveContainer>
@@ -592,19 +573,19 @@ export function AdminDashboard() {
                     <BarChart data={marketingMetricData}>
                       <XAxis
                           dataKey="name"
-                          stroke="#888888"
+                          stroke="#0D47A1"
                           fontSize={12}
-                          tickLine={false}
-                          axisLine={false}
+                          tickLine={true}
+                          axisLine={true}
                       />
                       <YAxis
-                          stroke="#888888"
+                          stroke="#0D47A1"
                           fontSize={12}
-                          tickLine={false}
-                          axisLine={false}
+                          tickLine={true}
+                          axisLine={true}
                           tickFormatter={(value) => `${value}`}
                       />
-                      <Bar dataKey="total" fill="#adfa1d" radius={[4, 4, 0, 0]}/>
+                      <Bar dataKey="total" fill="#2196F3" radius={[4, 4, 0, 0]}/>
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -622,19 +603,15 @@ export function AdminDashboard() {
                     <TableBody>
                       <TableRow key={'1'}>
                         <TableCell className="font-medium">Taxa de aproveitamento</TableCell>
-                        <TableCell>35%</TableCell>
+                        <TableCell>{metricData?.data.appointmentRate}</TableCell>
                       </TableRow>
                       <TableRow key={'2'}>
                         <TableCell className="font-medium">Taxa de desistência</TableCell>
-                        <TableCell>11%</TableCell>
+                        <TableCell>{metricData?.data.noShowRate}</TableCell>
                       </TableRow>
                       <TableRow key={'3'}>
-                        <TableCell className="font-medium">Taxa de absenteísmo</TableCell>
-                        <TableCell>23%</TableCell>
-                      </TableRow>
-                      <TableRow key={'4'}>
                         <TableCell className="font-medium">Taxa de ROAS</TableCell>
-                        <TableCell>43%</TableCell>
+                        <TableCell>{metricData?.data.roasPercentage}</TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
@@ -649,19 +626,19 @@ export function AdminDashboard() {
                     <BarChart data={investmentData}>
                       <XAxis
                           dataKey="name"
-                          stroke="#888888"
+                          stroke="#0D47A1"
                           fontSize={12}
-                          tickLine={false}
-                          axisLine={false}
+                          tickLine={true}
+                          axisLine={true}
                       />
                       <YAxis
-                          stroke="#888888"
+                          stroke="#0D47A1"
                           fontSize={12}
-                          tickLine={false}
-                          axisLine={false}
+                          tickLine={true}
+                          axisLine={true}
                           tickFormatter={(value) => `${value}`}
                       />
-                      <Bar dataKey="total" fill="#adfa1d" radius={[4, 4, 0, 0]}/>
+                      <Bar dataKey="total" fill="#2196F3" radius={[4, 4, 0, 0]}/>
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>

@@ -13,7 +13,35 @@ export interface MarketingFilters {
         examType?: string
         attended?: string
         exam_name?: string
+        month?: number
 }
+export interface MarketingMetricsResponse {
+    status: string;
+    message: string;
+    data: MarketingMetricsData;
+}
+
+export interface MarketingMetricsData {
+    CPL: number;
+    CAP: number;
+    ROAS: number;
+        roasPercentage: number;
+    averageTicket: number;
+    CPC: number;
+    LTV: number;
+    appointmentRate: number;
+    noShowRate: number;
+    conversionRate: number;
+    funnel: FunnelData;
+}
+
+export interface FunnelData {
+    clicks: number;
+    leads: number;
+    appointments: number;
+    completed: number;
+}
+
 export const listCanalMarketing = async (tenantID: number) => {
     return await apiClient.get('admin/marketing/canal', {
         headers: {
@@ -37,8 +65,8 @@ export const updateBudgetCanal = async (budget: number,tenantID: number) => {
         }
     })
 }
-export const registerCanalMarketing = async(canal: IMarketing, tenantID: number) => {
-    return await apiClient.post('admin/marketing/canal', canal, {
+export const findAllMetrics = async(month: string | undefined, tenantID: number) => {
+    return await apiClient.get(`admin/marketing/metrics?month=${month}`, {
         headers: {
             'x-tenant-id': tenantID
         }
@@ -68,11 +96,12 @@ export const countPatientExamWithFilters = async(filters: MarketingFilters,tenan
         params: filters
     })
 }
-export const countChannel = async(tenantID: number) => {
+export const countChannel = async(filters: MarketingFilters,tenantID: number) => {
     return await apiClient.get('admin/marketing/countChannel', {
         headers: {
             'x-tenant-id': tenantID
-        }
+        },
+        params: filters
     })
 }
 export const countTotalInvoice = async (filters: MarketingFilters, tenantID: number) => {
