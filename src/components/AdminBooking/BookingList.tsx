@@ -8,7 +8,7 @@ import { Trash2 } from 'lucide-react';
 
 interface ListaAgendamentosProps {
     agendamentos: IPatientExam[]
-    onConfirmarPresenca?: (id: number, presence: null | 'Sim' | 'Não') => void
+    onConfirmarPresenca?: (id: number, presence: null | 'Yes' | 'No') => void
     onDeleteBooking?: (id: number) => void
     loading: boolean
 }
@@ -21,18 +21,18 @@ const BookingList: React.FC<ListaAgendamentosProps> = ({ agendamentos ,loading, 
         return (<p className="text-base font-semibold">Não possuí procedimentos para o dia selecionado</p>)
     }
 
-    const handleConfirmarPresenca = (id: number, presence: null | 'Sim' | 'Não') => {
+    const handleConfirmarPresenca = (id: number, presence: null | 'Yes' | 'No') => {
         if (onConfirmarPresenca) {
             onConfirmarPresenca(id,presence);
         }
     }
-    const handlePresence = (attended: null | 'Sim' | 'Não') => {
+    const handlePresence = (attended: null | 'Yes' | 'No') => {
         switch(attended) {
             case null:
                 return 'Aguardando'
-            case 'Sim':
+            case 'Yes':
                 return 'Confirmado'
-            case 'Não':
+            case 'No':
                 return 'Não Compareceu'
         }
     }
@@ -67,7 +67,7 @@ const BookingList: React.FC<ListaAgendamentosProps> = ({ agendamentos ,loading, 
                                  <span className={agendamento.attended == null ? `text-oxfordBlue font-semibold` : agendamento.attended ? `text-green-700 font-semibold` : `text-red-600 font-semibold`}>{handlePresence(agendamento.attended)}</span>
                              </TableCell>
                              <TableCell>
-                                 <AppointmentConfirmation onCancel={() => handleConfirmarPresenca(agendamento?.id, null)} onConfirm={() => handleConfirmarPresenca(agendamento?.id, 'Sim')} onDecline={() => handleConfirmarPresenca(agendamento?.id, 'Não')} status={handlePresence(agendamento.attended)} />
+                                 <AppointmentConfirmation onCancel={() => handleConfirmarPresenca(agendamento?.id, null)} onConfirm={() => handleConfirmarPresenca(agendamento?.id, 'Yes')} onDecline={() => handleConfirmarPresenca(agendamento?.id, 'No')} status={handlePresence(agendamento.attended)} />
                              </TableCell>
                              <TableCell>
                                  <Button variant="ghost" onClick={() => handleDelete(agendamento.id)}>

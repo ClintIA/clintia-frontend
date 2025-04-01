@@ -148,16 +148,16 @@ export function AdminDashboard() {
     fetchCountPatientExam({ month: month }).then()
   }, [fetchCountPatientExam, month]);
   return (
-      <div className="w-full p-10 mx-auto">
+      <div className="w-full p-10 mx-auto text-oxfordBlue">
         <div className="flex items-center justify-between space-y-2">
-          <h2 className="text-3xl mb-6 font-bold tracking-tight">Dashboards</h2>
-          <div className="flex items-center space-x-2">
-              <Label htmlFor="w-max month-filter">Selecione um Mês</Label>
+          <h2 className="text-3xl mb-6 text-oxfordBlue font-bold tracking-tight">Dashboards</h2>
+          <div className="flex text-oxfordBlue flex-row items-center space-x-2">
+              <Label className="flex text-nowrap" htmlFor="month-filter">Selecione um Mês</Label>
               <Select defaultValue={month?.toString()} value={month.toString()} onValueChange={(e) => setMonth(Number(e))}>
-                <SelectTrigger id="month-filter">
+                <SelectTrigger className="text-oxfordBlue bg-gray-100 p-2 rounded-2xl " id="month-filter">
                   <SelectValue placeholder="Selecione o mês"/>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="border border-black">
                   <SelectItem value="all">Mês</SelectItem>
                   {months.map((m) => (
                       <SelectItem key={m.value} value={m.value}>
@@ -169,16 +169,16 @@ export function AdminDashboard() {
               </Select>
           </div>
         </div>
-        <Tabs defaultValue="visao-geral" className="space-y-4">
+        <Tabs defaultValue="visao-geral" className="space-y-4 text-oxfordBlue ">
           <TabsList>
-            <TabsTrigger value="visao-geral">Visão Geral</TabsTrigger>
-            <TabsTrigger value="marketing">Marketing</TabsTrigger>
+            <TabsTrigger className="text-oxfordBlue" value="visao-geral">Visão Geral</TabsTrigger>
+            <TabsTrigger  className="text-oxfordBlue" value="marketing">Marketing</TabsTrigger>
           </TabsList>
           <TabsContent value="visao-geral" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-oxfordBlue">
                     Faturamento Total do Mês
                   </CardTitle>
                   <svg
@@ -200,7 +200,7 @@ export function AdminDashboard() {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-oxfordBlue">
                     Total de Pacientes no Mês
                   </CardTitle>
                   <svg
@@ -224,7 +224,7 @@ export function AdminDashboard() {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-oxfordBlue">
                     Total de Procedimentos realizados no Mês
                   </CardTitle>
                   <svg
@@ -246,7 +246,7 @@ export function AdminDashboard() {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Lucro</CardTitle>
+                  <CardTitle className="text-sm font-medium text-oxfordBlue">Lucro</CardTitle>
                   <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -263,7 +263,7 @@ export function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div
-                      className="text-2xl font-bold">R$ {(Number(totalInvoice) - Number(totalDoctorInvoice)).toFixed(2)}</div>
+                      className="text-2xl font-bold text-oxfordBlue">R$ {(Number(totalInvoice) - Number(totalDoctorInvoice)).toFixed(2)}</div>
                 </CardContent>
               </Card>
 
@@ -271,7 +271,7 @@ export function AdminDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4">
                 <CardHeader>
-                  <CardTitle>Canais de Aquisição de Pacientes</CardTitle>
+                  <CardTitle className="text-oxfordBlue">Canais de Aquisição de Pacientes</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
                   <ResponsiveContainer width="100%" height={350}>
@@ -297,8 +297,8 @@ export function AdminDashboard() {
               </Card>
               <Card className="col-span-4 lg:col-span-3">
                 <CardHeader>
-                  <CardTitle>Faturamento por Procedimento</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-oxfordBlue">Faturamento por Procedimento</CardTitle>
+                  <CardDescription className="text-oxfordBlue">
                     Distribuição do faturamento entre os principais procedimentos
                   </CardDescription>
                 </CardHeader>
@@ -329,8 +329,8 @@ export function AdminDashboard() {
             </div>
             <Card>
               <CardHeader>
-                <CardTitle>Detalhes dos Procedimentos Realizados</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-oxfordBlue">Detalhes dos Procedimentos Realizados</CardTitle>
+                <CardDescription className="text-oxfordBlue">
                   Informações detalhadas sobre procedimentos, pagamentos e lucros.
                 </CardDescription>
               </CardHeader>
@@ -345,7 +345,7 @@ export function AdminDashboard() {
                       <TableHead>Lucro</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody>
+                  <TableBody className="text-oxfordBlue">
                     {exams?.map((exam) => (
                           <TableRow key={exam.profit}>
                             <TableCell className="font-medium">{exam.name}</TableCell>
@@ -362,8 +362,8 @@ export function AdminDashboard() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Valores a receber</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-oxfordBlue">Valores a receber</CardTitle>
+                <CardDescription className="text-oxfordBlue">
                   Informações detalhadas da quantidade de procedimentos realizadas por cada profissional.
                 </CardDescription>
               </CardHeader>
@@ -375,7 +375,7 @@ export function AdminDashboard() {
                       <TableHead>Procedimentos Realizados</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody>
+                  <TableBody className="text-oxfordBlue">
                     {totalInvoiceDoctor?.map((row) => {
                       return (
                           <TableRow key={row.name}>
@@ -393,7 +393,7 @@ export function AdminDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-oxfordBlue">
                     CPL
                   </CardTitle>
                   <svg
@@ -417,7 +417,7 @@ export function AdminDashboard() {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-oxfordBlue">
                     CAP
                   </CardTitle>
                   <svg
@@ -441,7 +441,7 @@ export function AdminDashboard() {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">ROAS</CardTitle>
+                  <CardTitle className="text-sm font-medium text-oxfordBlue">ROAS</CardTitle>
                   <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -462,7 +462,7 @@ export function AdminDashboard() {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-oxfordBlue">
                     LTV
                   </CardTitle>
                   <svg
@@ -486,7 +486,7 @@ export function AdminDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4">
                 <CardHeader>
-                  <CardTitle>Canais de Aquisição de Pacientes</CardTitle>
+                  <CardTitle className="text-oxfordBlue">Canais de Aquisição de Pacientes</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
                   <ResponsiveContainer width="100%" height={350}>
@@ -511,7 +511,7 @@ export function AdminDashboard() {
               </Card>
               <Card className="col-span-4 lg:col-span-3">
                 <CardHeader>
-                  <CardTitle>Funil de Marketing</CardTitle>
+                  <CardTitle className="text-oxfordBlue">Funil de Marketing</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
                   <ResponsiveContainer width="100%" height={350}>
@@ -534,8 +534,8 @@ export function AdminDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4">
                 <CardHeader>
-                  <CardTitle>Faturamento por Procedimento</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-oxfordBlue">Faturamento por Procedimento</CardTitle>
+                  <CardDescription className="text-oxfordBlue">
                     Distribuição do faturamento entre os principais procedimentos
                   </CardDescription>
                 </CardHeader>
@@ -566,7 +566,7 @@ export function AdminDashboard() {
 
               <Card className="col-span-4 lg:col-span-3">
                 <CardHeader>
-                  <CardTitle>Métricas (CPL , CPC, Ticket Médio)</CardTitle>
+                  <CardTitle className="text-oxfordBlue">Métricas (CPL , CPC, Ticket Médio)</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
                   <ResponsiveContainer width="100%" height={350}>
@@ -595,12 +595,12 @@ export function AdminDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4">
                 <CardHeader>
-                  <CardTitle>Indicadores de Desempenho</CardTitle>
-                  <CardDescription>Monitoramento das principais métricas de desempenho</CardDescription>
+                  <CardTitle className="text-oxfordBlue">Indicadores de Desempenho</CardTitle>
+                  <CardDescription className="text-oxfordBlue">Monitoramento das principais métricas de desempenho</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Table>
-                    <TableBody>
+                    <TableBody className="text-oxfordBlue">
                       <TableRow key={'1'}>
                         <TableCell className="font-medium">Taxa de aproveitamento</TableCell>
                         <TableCell>{metricData?.data.appointmentRate}</TableCell>
@@ -619,7 +619,7 @@ export function AdminDashboard() {
               </Card>
               <Card className="col-span-4 lg:col-span-3">
                 <CardHeader>
-                  <CardTitle>Investimento e ROAS</CardTitle>
+                  <CardTitle className="text-oxfordBlue">Investimento e ROAS</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
                   <ResponsiveContainer width="100%" height={350}>

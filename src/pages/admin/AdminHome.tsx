@@ -22,7 +22,7 @@ export interface IPatientExam {
   examDate: string
   uploadedAt: string | null
   status: string
-  attended: null | 'Sim' | 'Não'
+  attended: null | 'Yes' | 'No'
   exam: {
     id: number
     exam_name: string

@@ -13,7 +13,7 @@ export async function exportLeadsToCSV(leads: any[]) {
             ID: lead.id,
             Nome: lead.name,
             Telefone: lead.phoneNumber,
-            Agendado: lead.scheduled ? "Sim" : "Não",
+            Agendado: lead.scheduled ? "Yes" : "No",
             "Data de Contato": new Date(lead.callDate).toLocaleString("pt-BR"),
         }))
 
