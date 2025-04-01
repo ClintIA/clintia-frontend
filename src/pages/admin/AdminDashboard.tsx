@@ -271,7 +271,7 @@ export function AdminDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4">
                 <CardHeader>
-                  <CardTitle className="text-oxfordBlue">Canais de Aquisição de Pacientes</CardTitle>
+                  <CardTitle className="text-oxfordBlue">Canais de Aquisição por Pacientes</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
                   <ResponsiveContainer width="100%" height={350}>
@@ -486,7 +486,7 @@ export function AdminDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4">
                 <CardHeader>
-                  <CardTitle className="text-oxfordBlue">Canais de Aquisição de Pacientes</CardTitle>
+                  <CardTitle className="text-oxfordBlue">Canais de Aquisição por Exame</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
                   <ResponsiveContainer width="100%" height={350}>
