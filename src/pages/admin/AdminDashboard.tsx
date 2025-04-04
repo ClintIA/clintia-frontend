@@ -263,7 +263,7 @@ export function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div
-                      className="text-2xl font-bold text-oxfordBlue">R$ {(Number(totalInvoice) - Number(totalDoctorInvoice)).toFixed(2)}</div>
+                      className="text-2xl font-bold text-oxfordBlue">R$ {(Number(totalInvoice) - Number(totalDoctorInvoice))?.toFixed(2)}</div>
                 </CardContent>
               </Card>
 
