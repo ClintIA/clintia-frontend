@@ -160,7 +160,7 @@ const AdminManageMarketing: React.FC = () => {
     const calculatePercentages = () => {
         return allocations?.map(alloc => ({
             ...alloc,
-            percentage: ((Number(alloc.budgetCanal) / totalBudget) * 100).toFixed(1),
+            percentage: ((Number(alloc.budgetCanal) / totalBudget) * 100).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
             formattedAmount: `R$ ${Number(alloc.budgetCanal).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
         }))
     }
@@ -355,7 +355,7 @@ const AdminManageMarketing: React.FC = () => {
                                             label: function (context) {
                                                 const label = context.label || '';
                                                 const value = context.parsed || 0;
-                                                const percentage = ((Number(value) / totalBudget) * 100).toFixed(1);
+                                                const percentage = ((Number(value) / totalBudget) * 100).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
                                                 const formattedValue = `R$ ${value}`;
                                                 return `${label}: ${formattedValue} (${percentage}%)`;
                                             }
@@ -364,7 +364,7 @@ const AdminManageMarketing: React.FC = () => {
                                     datalabels: {
                                         formatter: (value) => {
                                             if ((value / totalBudget * 100)) {
-                                                return (value / totalBudget * 100).toFixed(1) + "%"
+                                                return (value / totalBudget * 100).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "%"
                                             } else {
                                                 return ''
                                             }
