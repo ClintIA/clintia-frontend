@@ -263,7 +263,7 @@ export function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div
-                      className="text-2xl font-bold text-oxfordBlue">R$ {(Number(totalInvoice) - Number(totalDoctorInvoice))?.toFixed(2)}</div>
+                      className="text-2xl font-bold text-oxfordBlue">R$ {(Number(totalInvoice) - Number(totalDoctorInvoice))}</div>
                 </CardContent>
               </Card>
 
@@ -316,7 +316,7 @@ export function AdminDashboard() {
                           label={({name, percent}: {
                             name: string;
                             percent: number
-                          }) => `${name} ${(percent).toFixed(0)}%`}
+                          }) => `${name} ${(percent)?.toFixed(0)}%`}
                       >
                         {exams?.map((_entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]}/>
@@ -457,7 +457,7 @@ export function AdminDashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{metricData?.data.ROAS.toFixed(4)}</div>
+                  <div className="text-2xl font-bold">{metricData?.data.ROAS?.toFixed(4)}</div>
                 </CardContent>
               </Card>
               <Card>
