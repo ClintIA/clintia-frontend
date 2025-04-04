@@ -457,7 +457,7 @@ export function AdminDashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{Number(metricData?.data.ROAS)?.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div className="text-2xl font-bold">{metricData?.data?.ROAS ? Number(metricData?.data.ROAS)?.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}</div>
                 </CardContent>
               </Card>
               <Card>
@@ -479,7 +479,7 @@ export function AdminDashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{Number(metricData?.data?.LTV)?.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div className="text-2xl font-bold">{metricData?.data?.LTV ? Number(metricData?.data?.LTV)?.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}</div>
                 </CardContent>
               </Card>
             </div>
@@ -603,15 +603,15 @@ export function AdminDashboard() {
                     <TableBody className="text-oxfordBlue">
                       <TableRow key={'1'}>
                         <TableCell className="font-medium">Taxa de aproveitamento</TableCell>
-                        <TableCell>{metricData?.data.appointmentRate}</TableCell>
+                        <TableCell>{metricData?.data.appointmentRate ? metricData?.data.appointmentRate : 0}</TableCell>
                       </TableRow>
                       <TableRow key={'2'}>
                         <TableCell className="font-medium">Taxa de desistência</TableCell>
-                        <TableCell>{metricData?.data.noShowRate}</TableCell>
+                        <TableCell>{metricData?.data.noShowRate ? metricData?.data.noShowRate : 0 }</TableCell>
                       </TableRow>
                       <TableRow key={'3'}>
                         <TableCell className="font-medium">Taxa de ROAS</TableCell>
-                        <TableCell>{metricData?.data.roasPercentage}</TableCell>
+                        <TableCell>{metricData?.data.roasPercentage ? metricData?.data.roasPercentage : 0}</TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
