@@ -350,9 +350,9 @@ export function AdminDashboard() {
                           <TableRow key={exam.profit}>
                             <TableCell className="font-medium">{exam.name}</TableCell>
                             <TableCell>{exam.quantity}</TableCell>
-                            <TableCell>R$ {exam.total.toFixed(2)}</TableCell>
+                            <TableCell>R$ {exam?.total?.toFixed(2)}</TableCell>
                             <TableCell>R$ {exam.totalDoctor}</TableCell>
-                            <TableCell>R$ {exam.profit?.toFixed(2)}</TableCell>
+                            <TableCell>R$ {exam?.profit?.toFixed(2)}</TableCell>
                           </TableRow>
                       )
                     )}
@@ -412,7 +412,7 @@ export function AdminDashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{metricData?.data.CPL.toFixed(4)}</div>
+                  <div className="text-2xl font-bold">{metricData?.data?.CPL?.toFixed(4)}</div>
                 </CardContent>
               </Card>
               <Card>
@@ -435,7 +435,7 @@ export function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{
-                    `R$ ${Number(metricData?.data.CAP).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                    `R$ ${Number(metricData?.data.CAP)?.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                    }</div>
                 </CardContent>
               </Card>
@@ -479,7 +479,7 @@ export function AdminDashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{metricData?.data.LTV.toFixed(5)}</div>
+                  <div className="text-2xl font-bold">{metricData?.data?.LTV?.toFixed(5)}</div>
                 </CardContent>
               </Card>
             </div>
@@ -553,7 +553,7 @@ export function AdminDashboard() {
                           label={({name, percent}: {
                             name: string;
                             percent: number
-                          }) => `${name} ${(percent).toFixed(0)}%`}
+                          }) => `${name} ${(percent)?.toFixed(0)}%`}
                       >
                         {exams?.map((_entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]}/>
