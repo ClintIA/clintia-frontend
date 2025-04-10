@@ -10,6 +10,7 @@ export interface CreateLeadDTO {
     indication_name?: string;
     contactChannel?: string;
     diagnosis?: string;
+    observation?: string;
     scheduled?: boolean;
     scheduledDate?: string;
     scheduledDoctorId?: number;

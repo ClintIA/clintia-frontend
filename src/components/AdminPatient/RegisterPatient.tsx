@@ -24,6 +24,7 @@ export interface DadosPaciente {
     cpf?: string
     cep?: string
     diagnostic?: string
+    observation?: string
     canal?: string
     gender?: string
     exams?: any[]

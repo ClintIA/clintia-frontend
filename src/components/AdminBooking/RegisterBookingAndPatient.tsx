@@ -4,7 +4,7 @@ import {Button} from "@/components/ui/button.tsx"
 import {Input} from "@/components/ui/input.tsx"
 import {Label} from "@/components/ui/label.tsx"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card.tsx"
-import {AlertCircle} from "lucide-react"
+import {AlertCircle, CircleAlert} from "lucide-react"
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx"
 import {DadosPaciente} from "@/components/AdminPatient/RegisterPatient.tsx";
@@ -80,6 +80,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
             dob: '',
             cpf: '',
             diagnostic: '',
+            observation: '',
             canal:'',
             cep:'',
             gender: '',
@@ -161,9 +162,13 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
     const handlePhoneCheck = async (e: React.FormEvent) => {
         e.preventDefault()
         setErro(null)
+        if(!phone) {
+            setErro('Preencha um telefone para contato')
+            return
+        }
         const checkPhone = validarTelefone(phone)
         if (!checkPhone) {
-            setErro('Por favor, insira um Telefone')
+            setErro('Por favor, insira um Telefone válido')
             return
         }
          if (!checkPhone) {
@@ -230,24 +235,14 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
     const handleSubmitLead = async (e: React.FormEvent) => {
         e.preventDefault()
         setErro(null)
-        if(!patientData?.full_name) {
-            setErro('Por favor, preencha o nome')
+        if(!phone) {
+            setErro('Preencha um telefone para contato')
             return
         }
-        if(!selectedCanal) {
-            setErro('Por favor, selecione um canal de contato')
+        if(!patientData?.full_name || !selectedCanal || !selectedChannelContact || !selectedExame) {
+            setErro('Por favor, Dados Obrigatórios: Nome, Telefone, Canal de Contato e Captação e Procedimento')
             return
         }
-        if(!selectedChannelContact) {
-            setErro('Por favor, selecione um canal de captação')
-            return
-        }
-        if(!selectedExame) {
-            setErro('Por favor, selecione um procedimento')
-            return
-        }
-
-
         try {
             if (auth.tenantId) {
                 setIsLoading(true)
@@ -257,10 +252,11 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                     indication_name: patientData.indication_name || undefined,
                     scheduledDoctorId: parseInt(selectedDoctor) || undefined,
                     diagnosis: patientData.diagnostic || undefined,
+                    observation: patientData.observation || undefined,
                     examId: parseInt(selectedExame) || undefined,
                     canal: selectedCanal || undefined,
                     scheduledDate: dadosBooking.examDate || undefined,
-                    contactChannel: selectedChannelContact
+                    contactChannel: selectedChannelContact || undefined,
                 }, auth.tenantId)
                 if (response.status === 201) {
                     toast({
@@ -275,8 +271,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                 }
             }
         } catch (error) {
-            console.error(error);
-            setErro('Falha ao registrar o contato.');
+            setErro('Falha ao registrar o contato: ' + error);
         } finally {
             setIsLoading(false)
 
@@ -321,6 +316,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                    indication_name: patientData.indication_name || undefined,
                    contactChannel: patientData.contactChannel || undefined,
                    diagnosis: patientData.diagnostic || undefined,
+                   observation: patientData.observation || undefined,
                    scheduled: !!bookingDados.examDate,
                    scheduledDate: bookingDados.examDate || undefined,
                    scheduledDoctorId: bookingDados.doctorId || undefined,
@@ -425,8 +421,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                        <form onSubmit={handleSubmit}>
                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                <div className="col-span-4 space-y-2">
-                                   <Label htmlFor="phone" className="text-oxfordBlue">
-                                       Telefone
+                                   <Label htmlFor="phone" className="flex text-oxfordBlue">
+                                       Telefone <CircleAlert className="ml-2" size={12} color={'red'}/>
                                    </Label>
                                    <div className="flex items-center gap-2">
                                        <Input
@@ -453,8 +449,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                {showForm && (
                                    <>
                                        <div className="col-span-2 space-y-2">
-                                           <Label htmlFor="full_name" className="text-oxfordBlue">
-                                               Nome
+                                           <Label htmlFor="full_name" className="flex text-oxfordBlue">
+                                               Nome <CircleAlert className="ml-2" size={12} color={'red'}/>
                                            </Label>
                                            <Input
                                                id="full_name"
@@ -482,7 +478,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                                Plano de Saúde
                                            </Label>
                                            <Input
-                                                id="health_card_number"
+                                               id="health_card_number"
                                                name="health_card_number"
                                                type="tel"
                                                value={patientData?.health_card_number}
@@ -504,10 +500,11 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                                   onChange={handleInputChange}/>
                                        </div>
                                        <div className=" space-y-2">
-                                           <Label htmlFor="contactChannel" className="text-oxfordBlue">
-                                               Canal de Contato
+                                           <Label htmlFor="contactChannel" className="flex text-oxfordBlue">
+                                               Canal de Contato <CircleAlert className="ml-2" size={12} color={'red'}/>
                                            </Label>
-                                           <Select value={selectedChannelContact} onValueChange={setSelectedChannelContact}>
+                                           <Select value={selectedChannelContact}
+                                                   onValueChange={setSelectedChannelContact}>
                                                <SelectTrigger id="contactChannel">
                                                    <SelectValue placeholder="Canal de Contato"/>
                                                </SelectTrigger>
@@ -521,8 +518,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                            </Select>
                                        </div>
                                        <div className=" space-y-2">
-                                           <Label htmlFor="canal" className="text-oxfordBlue">
-                                               Canal de Captação
+                                           <Label htmlFor="canal" className="flex text-oxfordBlue">
+                                               Canal de Captação <CircleAlert className="ml-2" size={12} color={'red'}/>
                                            </Label>
                                            <Select value={selectedCanal} onValueChange={setSelectedCanal}>
                                                <SelectTrigger id="canal">
@@ -544,7 +541,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                                            <Label htmlFor="indication_name" className="text-oxfordBlue">
                                                                Nome
                                                            </Label>
-                                                           <Input id="cep" name="indication_name" type="text" value={patientData?.indication_name}
+                                                           <Input id="cep" name="indication_name" type="text"
+                                                                  value={patientData?.indication_name}
                                                                   onChange={handleInputChange}/>
                                                        </div>
                                                    )
@@ -585,9 +583,22 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                                className="h-16"
                                            />
                                        </div>
+                                       <div className="col-span-4 space-y-2">
+                                           <Label htmlFor="observation" className="text-oxfordBlue">
+                                               Observação
+                                           </Label>
+                                           <Input
+                                               id="observation"
+                                               name="observation"
+                                               type="text"
+                                               value={patientData?.observation}
+                                               onChange={handleInputChange}
+                                               className="h-8"
+                                           />
+                                       </div>
                                        <div className=" space-y-2">
-                                           <Label htmlFor="examId" className="text-oxfordBlue">
-                                               Exame
+                                           <Label htmlFor="examId" className="flex text-oxfordBlue">
+                                               Exame <CircleAlert className="ml-2" size={12} color={'red'}/>
                                            </Label>
                                            <Select disabled={!patientData} value={selectedExame}
                                                    onValueChange={setSelectedExame}>
@@ -637,12 +648,14 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                    </>
                                )}
                            </div>
-                           { showForm && (<div className="flex justify-between mt-8 gap-4">
-                               <Button disabled={!!dadosBooking.examDate} className="bg-oxfordBlue text-white w-70" type="button"
+                           {showForm && (<div className="flex justify-between mt-8 gap-4">
+                               <Button disabled={!!dadosBooking.examDate} className="bg-oxfordBlue text-white w-70"
+                                       type="button"
                                        onClick={handleSubmitLead}>
                                    Registrar Contato
                                </Button>
-                               <Button disabled={!dadosBooking.examDate} className="bg-oxfordBlue text-white w-70" type="submit">
+                               <Button disabled={!dadosBooking.examDate} className="bg-oxfordBlue text-white w-70"
+                                       type="submit">
                                    Salvar Agendamento
                                </Button>
                            </div>)}

@@ -1,41 +1,33 @@
-import { writeFile } from "fs/promises"
-import { join } from "path"
-import {convertToCSV} from "@/lib/csv-export.ts";
+import * as XLSX from "xlsx"
 
 /**
  * Função de servidor para exportar dados para CSV
  * Útil para conjuntos de dados grandes que podem ser melhor processados no servidor
  */
-export async function exportLeadsToCSV(leads: any[]) {
+export async function exportLeadsToCSV(data: any[]) {
     try {
-        // Preparar dados para exportação
-        const exportData = leads.map((lead) => ({
-            ID: lead.id,
-            Nome: lead.name,
-            Telefone: lead.phoneNumber,
-            Agendado: lead.scheduled ? "Yes" : "No",
-            "Data de Contato": new Date(lead.callDate).toLocaleString("pt-BR"),
-        }))
 
-        // Converter para CSV
-        const csvData = convertToCSV(exportData)
+            const workbook = XLSX.utils.book_new()
 
-        // Gerar nome do arquivo com data atual
+            const worksheet = XLSX.utils.json_to_sheet(data)
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Employees")
+
         const date = new Date()
         const formattedDate = date.toISOString().split("T")[0] // YYYY-MM-DD
-        const filename = `leads_${formattedDate}.csv`
+        const filename = `RELATORIO_LEADS_${formattedDate}.xlsx`
 
         // Caminho para salvar o arquivo (ajuste conforme necessário)
-        const filePath = join(process.cwd(), "public", "exports", filename)
 
         // Salvar o arquivo
-        await writeFile(filePath, csvData)
+        XLSX.writeFile(workbook, filename)
 
         // Retornar o caminho relativo para download
         return `/exports/${filename}`
+        // Retornar o caminho relativo para download
     } catch (error) {
-        console.error("Erro ao exportar CSV no servidor:", error)
-        throw new Error("Falha ao exportar dados para CSV")
+        console.error("Erro ao exportar XLSX no servidor:", error)
+        throw new Error("Falha ao exportar dados para XLSX")
     }
 }
 

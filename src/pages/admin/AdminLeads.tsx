@@ -18,9 +18,9 @@ import {ptBR} from "date-fns/locale";
 import {LeadDateFilter} from "@/components/AdminBooking/LeadDateFilter.tsx";
 import {Pagination} from "@/components/Pagination.tsx";
 import {days, months} from "@/lib/optionsFixed.ts";
-import {convertToCSV, downloadCSV} from "@/lib/csv-export.ts";
 import {Button} from "@/components/ui/button.tsx";
 import {Download} from "lucide-react";
+import {exportLeadsToCSV} from "@/components/serverExportCsv.tsx";
 
 const AdminLeads: React.FC = () => {
 
@@ -91,32 +91,24 @@ const AdminLeads: React.FC = () => {
         fetchLeads(date).then()
         setDateFilters(date)
     }
-    const exportToCSV = () => {
+    const exportToCSV = async () => {
         const indexOfLastItem = currentPage * itemsPerPage;
         const indexOfFirstItem = indexOfLastItem - itemsPerPage;
         const filteredPacientes: CreateLeadDTO[] = pacientes.slice(indexOfFirstItem, indexOfLastItem);
         const exportData = filteredPacientes.map((lead) => ({
-            ID: lead.id || '',
-            Nome: lead.name || '',
-            Telefone: lead.phoneNumber|| '',
+            Nome: lead.name || 'Sem Registro',
+            Telefone: lead.phoneNumber || 'Sem Registro',
             Canal: canal.find(item => item.id == Number(lead.canal))?.canal || 'Sem Registro',
-            "Data do Contato": lead.callDate ? format(lead.callDate, "dd/MM/yyyy", {locale: ptBR}) : '',
-            ["Indicação"]: lead.indication_name,
+            "Data do Contato": lead.callDate ? format(lead.callDate, "dd/MM/yyyy", {locale: ptBR}) : 'Sem Registro',
+            ["Indicação"]: lead.indication_name || 'Sem Registro',
             "Canal de Contato": lead.contactChannel === "phone" ? "Telefone" : "Whatsapp",
-            Agendamento: lead.scheduledDate ? format(lead.scheduledDate, "dd/MM/yyyy", {locale: ptBR}) : '',
-            ["Médico Agendado"]: lead.scheduledDoctor?.fullName,
-            "Exame Agendado": lead.exam?.exam_name,
-            ["Diagnóstico"]: lead.diagnosis,
+            Agendamento: lead.scheduledDate ? format(lead.scheduledDate, "dd/MM/yyyy", {locale: ptBR}) : 'Sem Registro',
+            ["Médico Agendado"]: lead.scheduledDoctor?.fullName || 'Sem Registro',
+            "Exame Agendado": lead.exam?.exam_name || 'Sem Registro',
+            ["Diagnóstico"]: lead.diagnosis || 'Sem Registro',
+            ["Observação"]: lead.observation || 'Sem Registro'
         }))
-
-        const csvData = convertToCSV(exportData)
-
-        const date = new Date()
-        const formattedDate = date.toISOString().split("T")[0] // YYYY-MM-DD
-        const filename = `RELATORIO_LEADS_${formattedDate}.csv`
-
-        // Iniciar download
-        downloadCSV(csvData, filename)
+        await exportLeadsToCSV(exportData)
     }
     const handleConfirmationDelete = (id: number) => {
         setGeneralMessage("Deseja deletar o lead selecionado?")
@@ -154,6 +146,7 @@ const AdminLeads: React.FC = () => {
             <TableCell className="text-oxfordBlue capitalize">{lead.scheduledDoctor?.fullName || 'Sem Registro'}</TableCell>
             <TableCell className="text-oxfordBlue capitalize">{lead.exam?.exam_name || 'Sem Registro'}</TableCell>
             <TableCell className="text-oxfordBlue capitalize">{lead.diagnosis || 'Sem Registro'}</TableCell>
+            <TableCell className="text-oxfordBlue capitalize">{lead.observation || 'Sem Registro'}</TableCell>
 
         </>
     );
@@ -225,7 +218,7 @@ const AdminLeads: React.FC = () => {
                        <div>
                            <Button onClick={exportToCSV} disabled={pacientes.length === 0 || loading} className="flex items-center gap-2">
                                <Download className="h-4 w-4" />
-                               Exportar CSV
+                               Exportar Excel
                            </Button>
                        </div>
                     </div>
@@ -242,7 +235,7 @@ const AdminLeads: React.FC = () => {
                                 {!dateFilters.day && !dateFilters.month && !dateFilters.year ||
                                     (<CardTitle className="text-oxfordBlue text-xl p-4">
                                         {`
-                                             Mês: ${
+                                             Dia: ${
                                             dateFilters.day
                                                 ? days.find(item => item.toString() === dateFilters.day?.toString())
                                                 : 'Todos'},
@@ -266,6 +259,8 @@ const AdminLeads: React.FC = () => {
                                             <TableHead className="text-oxfordBlue">Médico Agendado</TableHead>
                                             <TableHead className="text-oxfordBlue">Exame Agendado</TableHead>
                                             <TableHead className="text-oxfordBlue">Diagnóstico</TableHead>
+                                            <TableHead className="text-oxfordBlue">Observações</TableHead>
+
                                         </TableRow>
                                     </TableHeader>
                                     <DataTable
