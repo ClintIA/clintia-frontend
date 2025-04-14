@@ -54,9 +54,8 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
                 setCanal(result.data.data)
             }
         }
-    }, [auth.tenantId])
+    }, [])
     useEffect( () => {
-
         const fetchExams = async () => {
             try {
                 if(auth.tenantId) {
@@ -68,11 +67,7 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
                     }
                     if(result?.data.status === "success") {
                         setExames(result?.data.data)
-                        if (dadosIniciais?.exam?.id) {
-                            setSelectedExame(dadosIniciais.exam.id?.toString() || '')
-                        }
                         setErro(null)
-
                     }
                 }
             } catch (error) {
@@ -83,12 +78,15 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
             }
         }
         fetchExams().then()
-    }, [auth.tenantId])
+    }, [auth.tenantId,dadosIniciais])
 
     useEffect( () => {
         const fetchDoctors = async () => {
             try {
-                if(auth.tenantId && selectedExame) {
+                if(auth.tenantId) {
+                    if (dadosIniciais?.exam?.id) {
+                        setSelectedExame(String(dadosIniciais.exam.id))
+                    }
                     const exam = exames.find((exam) => exam.id === parseInt(selectedExame))
                     if(exam) {
                         setIsLoading(true)
@@ -100,7 +98,7 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
                             } else {
                                 setDoctors(result?.data.data)
                                 if (dadosIniciais?.scheduledDoctor?.id) {
-                                    setSelectedDoctor(dadosIniciais.scheduledDoctor.id?.toString() || '')
+                                    setSelectedDoctor(String(dadosIniciais.scheduledDoctor.id))
                                 }
                                 setErro(null)
                             }
@@ -112,9 +110,11 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
             } finally {
                 setIsLoading(false)
             }
+
         }
+
         fetchDoctors().then()
-    }, [exames, selectedExame, auth.tenantId]);
+    }, [exames, selectedExame, auth.tenantId,dadosIniciais]);
     useEffect(() => {
         fetchCanal().then()
         if (dadosIniciais?.canal) {
