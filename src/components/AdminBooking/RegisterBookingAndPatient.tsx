@@ -32,7 +32,7 @@ export interface ExamesSelect {
     price: string
     createdAt: Date
 }
-interface Doctor {
+export interface Doctor {
     id: number
     fullName: string
     exams: any[]
@@ -535,7 +535,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                            </Select>
                                        </div>
                                        {canal.map((item) => {
-                                               if ((selectedCanal == item.id) && (item.canal == "Indicação" || item.canal == "Outros")) {
+                                               if ((Number(selectedCanal) == item.id) && (item.canal == "Indicação" || item.canal == "Outros")) {
                                                    return (
                                                        <div className="space-y-2">
                                                            <Label htmlFor="indication_name" className="text-oxfordBlue">

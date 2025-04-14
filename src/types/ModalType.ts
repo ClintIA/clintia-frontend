@@ -10,7 +10,7 @@ export enum ModalType {
     editDoctorAdmin = 'editDoctorAdmin',
     newAdmin = 'newAdmin',
     editAdmin = 'editAdmin',
-    newCanal = 'newCanal',
+    editBookingPatient = 'editBookingPatient',
     newLead = 'newLead',
     editLead = 'editLead'
 }

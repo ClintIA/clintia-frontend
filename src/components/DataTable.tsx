@@ -61,6 +61,12 @@ const DataTable = <T,>({ dataTable, openModalEdit, deleteData, openModalBooking,
                                                 <span className="text-sm">Editar</span>
                                             </Button>
                                         )}
+                                        {Object.prototype.hasOwnProperty.call(data, 'callDate') && (
+                                            <Button onClick={() => openModalEdit('Editar Lead',ModalType.editBookingPatient, data)}
+                                                    className="w-full bg-oxfordBlue text-white">
+                                                <Pencil className="mr-1 h-4 w-4"/>
+                                                <span className="text-sm">Editar</span>
+                                            </Button>)}
                                         {!Object.prototype.hasOwnProperty.call(data, 'phoneNumber') && openModalBooking && (
                                             <Button onClick={() => openModalEdit('Editar Agendamento',ModalType.booking, data)}
                                                     className="w-full bg-oxfordBlue text-white">

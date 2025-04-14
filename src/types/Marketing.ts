@@ -1,5 +1,5 @@
 export interface IMarketing {
-    id?: number
+    id: number
     canal?: string
     budgetCanal?: string
     createdBy?: number
