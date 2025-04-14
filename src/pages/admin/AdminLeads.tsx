@@ -136,7 +136,7 @@ const AdminLeads: React.FC = () => {
             <TableCell className="text-oxfordBlue">{lead.phoneNumber || 'Sem Registro'}</TableCell>
             <TableCell className="text-oxfordBlue">{lead.callDate  ? format(lead.callDate, "dd/MM/yyyy", {locale: ptBR}) : 'Sem Registro'}</TableCell>
             <TableCell className="text-oxfordBlue">{canal.map((item) => (
-                <span>
+                <span key={item.id}>
                     {(item.id === Number(lead.canal)) ? item.canal : <></>}
                 </span>
             ))}</TableCell>

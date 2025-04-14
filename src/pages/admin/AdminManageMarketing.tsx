@@ -82,7 +82,7 @@ const AdminManageMarketing: React.FC = () => {
         e.preventDefault()
 
         const newMetrics: IMarketing = {
-            id: canal?.id,
+            id: Number(canal?.id),
             canal: canal?.canal,
             cost: updateMetrics.cost || canal?.cost,
             budgetCanal: updateMetrics.budgetCanal || canal?.cost,
@@ -92,7 +92,7 @@ const AdminManageMarketing: React.FC = () => {
         if(auth.tenantId) {
             const result = await updateCanalMarketing({
                 ...newMetrics,
-                id: canal?.id,
+                id: Number(canal?.id),
                 cost: updateMetrics.cost?.replace(',','.'),
                 budgetCanal: updateMetrics.budgetCanal?.replace(',','.'),
             },

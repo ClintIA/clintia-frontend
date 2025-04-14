@@ -15,6 +15,7 @@ import RegisterTenantExam from "@/components/AdminTenantExam/RegisterTenantExam.
 import {IMarketing} from "@/types/Marketing.ts";
 import {Exams} from "@/pages/admin/AdminTenantExams.tsx";
 import {CreateLeadDTO} from "@/types/dto/CreateLead.ts";
+import EditPatientAndLead from "@/components/AdminBooking/EditPatientAndLead.tsx";
 
 
 interface ModalRegisterProps {
@@ -115,6 +116,8 @@ const ModalRender: React.FC<ModalRegisterProps> = ({ isStepper = false,isOpen, o
                 )
             case 'newBookingPatient':
                 return(<RegisterBookingAndPatient title={title} setStep={setStep} handleModalMessage={openModal} />)
+            case 'editBookingPatient':
+                return(<EditPatientAndLead title={title} dadosIniciais={data} />)
             case 'bookingConfirmation':
                 return(<BookingConfirmation setStep={setStep} dadosBooking={patientData} onNewBooking={openModal} />)
             case 'newDoctorAdmin':

@@ -347,7 +347,7 @@ export function AdminDashboard() {
                   </TableHeader>
                   <TableBody className="text-oxfordBlue">
                     {exams?.map((exam) => (
-                          <TableRow key={exam.profit}>
+                          <TableRow key={exam.name}>
                             <TableCell className="font-medium">{exam.name}</TableCell>
                             <TableCell>{exam.quantity}</TableCell>
                             <TableCell>R$ {Number(exam?.total)?.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
