@@ -92,10 +92,7 @@ const AdminLeads: React.FC = () => {
         setDateFilters(date)
     }
     const exportToCSV = async () => {
-        const indexOfLastItem = currentPage * itemsPerPage;
-        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-        const filteredPacientes: CreateLeadDTO[] = pacientes.slice(indexOfFirstItem, indexOfLastItem);
-        const exportData = filteredPacientes.map((lead) => ({
+        const exportData = pacientes.map((lead) => ({
             Nome: lead.name || 'Sem Registro',
             Telefone: lead.phoneNumber || 'Sem Registro',
             Canal: canal.find(item => item.id == Number(lead.canal))?.canal || 'Sem Registro',
