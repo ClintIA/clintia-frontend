@@ -95,7 +95,7 @@ const AdminLeads: React.FC = () => {
         const exportData = pacientes.map((lead) => ({
             Nome: lead.name || 'Sem Registro',
             Telefone: lead.phoneNumber || 'Sem Registro',
-            Canal: canal.find(item => item.id == Number(lead.canal))?.canal || 'Sem Registro',
+            Canal: canal.find((item) => item.id === Number(lead.canal))?.canal || 'Sem Registro',
             "Data do Contato": lead.callDate ? format(lead.callDate, "dd/MM/yyyy", {locale: ptBR}) : 'Sem Registro',
             ["Indicação"]: lead.indication_name || 'Sem Registro',
             "Canal de Contato": lead.contactChannel === "phone" ? "Telefone" : "Whatsapp",

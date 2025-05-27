@@ -300,7 +300,18 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
                                 }
                                 return null
                             })}
-
+                            <div className="space-y-2">
+                                <Label htmlFor="callDate" className="text-right text-oxfordBlue">
+                                    Data de Contato
+                                </Label>
+                                <Input
+                                    id="callDate"
+                                    name="callDate"
+                                    type="date"
+                                    value={leadData?.callDate ? new Date(leadData.callDate).toISOString().split('T')[0] : ''}
+                                    onChange={handleInputChange}
+                                    className="col-span-3"/>
+                            </div>
                             <div className="col-span-4 space-y-2">
                                 <Label htmlFor="diagnostic" className="text-oxfordBlue">
                                     Diagnóstico

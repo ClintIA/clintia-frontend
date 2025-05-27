@@ -130,7 +130,10 @@ const AdminLead: React.FC<LeadRegisterProps> = ({leadInfo}: LeadRegisterProps) =
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setErro(null)
-
+        if(!selectedExame || !selectedCanal || !selectedChannelContact) {
+            setErro("Preencha todos os campos obrigatórios")
+            return
+        }
         try {
             if (auth.tenantId) {
                 setIsLoading(true)
@@ -305,7 +308,19 @@ const AdminLead: React.FC<LeadRegisterProps> = ({leadInfo}: LeadRegisterProps) =
                                     onChange={handleInputChange}
                                     className="col-span-3 h-12"/>
                             </div>
-                            <div className=" space-y-2">
+                            <div className="space-y-2">
+                                <Label htmlFor="callDate" className="text-right text-oxfordBlue">
+                                    Data de Contato
+                                </Label>
+                                <Input
+                                    id="callDate"
+                                    name="callDate"
+                                    type="date"
+                                    value={leadRegister.callDate ? new Date(leadRegister.callDate).toISOString().split('T')[0] : ''}
+                                    onChange={handleInputChange}
+                                    className="col-span-3"/>
+                            </div>
+                            <div className="space-y-2">
                                 <Label htmlFor="examId" className="text-oxfordBlue">
                                     Exame
                                 </Label>

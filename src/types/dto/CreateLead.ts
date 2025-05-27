@@ -4,7 +4,7 @@ import {IDoctor} from "@/components/AdminDoctor/RegisterDoctor.tsx";
 export interface CreateLeadDTO {
     id?: number
     name?: string;
-    callDate?: Date;
+    callDate?: Date | string;
     phoneNumber?: string;
     canal?: string;
     indication_name?: string;

@@ -86,7 +86,8 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
             gender: '',
             health_card_number: '',
             contactChannel: '',
-            indication_name: ''
+            indication_name: '',
+            callDate: ''
         })
         setNotFoundPhone(false)
         setShowForm(false)
@@ -213,6 +214,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
     const submitBookingExam = async (bookingDados: DadosBooking, tenantId: number | undefined, patientData?: DadosPaciente) => {
         try {
                 if(patientData) {
+                    delete patientData.callDate
                    const result = await updatePatient(patientData, tenantId)
                     if(!result) {
                         setErro('Erro ao atualizar dados do paciente')
@@ -255,6 +257,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                     observation: patientData.observation || undefined,
                     examId: parseInt(selectedExame) || undefined,
                     canal: selectedCanal || undefined,
+                    callDate: patientData.callDate || undefined,
                     scheduledDate: dadosBooking.examDate || undefined,
                     contactChannel: selectedChannelContact || undefined,
                 }, auth.tenantId)
@@ -317,6 +320,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                    contactChannel: patientData.contactChannel || undefined,
                    diagnosis: patientData.diagnostic || undefined,
                    observation: patientData.observation || undefined,
+                   callDate: patientData.callDate || undefined,
                    scheduled: !!bookingDados.examDate,
                    scheduledDate: bookingDados.examDate || undefined,
                    scheduledDoctorId: bookingDados.doctorId || undefined,
@@ -330,7 +334,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                        patientData.phone = phone
                        patientData.canal = selectedCanal
                        patientData.contactChannel = selectedChannelContact
-
+                       delete patientData.callDate
                        const bookingWithPatient: BookingWithPatient = {
                            patientData: {...patientData, dob: createDate(patientData.dob)},
                            examId: parseInt(selectedExame),
@@ -359,6 +363,7 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                    patientData.phone = phone
                    patientData.canal = selectedCanal
                    patientData.contactChannel = selectedChannelContact
+                   delete patientData.callDate
                    try {
                        setIsLoading(true)
                        const result = await submitBookingExam(bookingDados, auth.tenantId, patientData)
@@ -549,6 +554,18 @@ const RegisterBookingAndPatient: React.FC<BookingModalProps> = ({title,handleMod
                                                }
                                            }
                                        )}
+                                       <div className="space-y-2">
+                                           <Label htmlFor="callDate" className="text-right text-oxfordBlue">
+                                               Data de Contato
+                                           </Label>
+                                           <Input
+                                               id="callDate"
+                                               name="callDate"
+                                               type="date"
+                                               value={patientData?.callDate ? new Date(patientData.callDate).toISOString().split('T')[0] : ''}
+                                               onChange={handleInputChange}
+                                               className="col-span-3"/>
+                                       </div>
                                        <div className="col-span-4 space-y-2">
                                            <Label htmlFor="gender" className="text-oxfordBlue">
                                                Gênero

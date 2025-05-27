@@ -34,6 +34,7 @@ export interface DadosPaciente {
     contactChannel?: string;
     indication_name?: string;
     health_card_number?: string
+    callDate?: string;
     tenants?: any[]
 }
 
