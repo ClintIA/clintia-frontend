@@ -161,6 +161,8 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
                     scheduledDate: createDate(scheduledDate) || undefined,
                     scheduledDoctorId: selectedDoctor ? parseInt(selectedDoctor) : undefined,
                     examId: selectedExame ? parseInt(selectedExame) : undefined,
+                    diagnosis: leadData.diagnosis || undefined,
+                    indication_name: leadData.indication_name || undefined
                 }
 
                 canal.map((item) => {
@@ -313,14 +315,14 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
                                     className="col-span-3"/>
                             </div>
                             <div className="col-span-4 space-y-2">
-                                <Label htmlFor="diagnostic" className="text-oxfordBlue">
+                                <Label htmlFor="diagnosis" className="text-oxfordBlue">
                                     Diagnóstico
                                 </Label>
                                 <Input
-                                    id="diagnostic"
-                                    name="diagnostic"
+                                    id="diagnosis"
+                                    name="diagnosis"
                                     type="text"
-                                    value={leadData?.diagnosis}
+                                    placeholder={leadData?.diagnosis}
                                     onChange={handleInputChange}
                                     className="h-16"
                                 />
