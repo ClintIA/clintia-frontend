@@ -166,7 +166,7 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
                 }
 
                 canal.map((item) => {
-                    if (!((Number(selectedCanal) == item.id) && (item.canal == "Outros"))) {
+                    if (!((Number(selectedCanal) == item.id) && (item.canal !== "Indicação" && item.canal !== "Outros"))) {
                         leadUpdateData.indication_name = ''
                     }
                 })
