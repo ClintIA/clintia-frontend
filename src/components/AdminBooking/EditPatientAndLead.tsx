@@ -165,12 +165,6 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
                     indication_name: leadData.indication_name || undefined
                 }
 
-                canal.map((item) => {
-                    if (!((Number(selectedCanal) == item.id) && (item.canal !== "Indicação" && item.canal !== "Outros"))) {
-                        leadUpdateData.indication_name = ''
-                    }
-                })
-
                 const leadResponse = await updateLead(leadUpdateData, auth.tenantId)
                 if (!leadResponse || leadResponse.status !== 200) {
                     setErro('Erro ao atualizar dados do lead')
