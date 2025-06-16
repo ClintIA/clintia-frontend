@@ -166,12 +166,10 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
                 }
 
                 canal.map((item) => {
-                    if (!((Number(selectedCanal) == item.id) && (item.canal == "Indicação" || item.canal == "Outros"))) {
+                    if (!((Number(selectedCanal) == item.id) && (item.canal == "Outros"))) {
                         leadUpdateData.indication_name = ''
                     }
                 })
-
-                console.log(leadUpdateData)
 
                 const leadResponse = await updateLead(leadUpdateData, auth.tenantId)
                 if (!leadResponse || leadResponse.status !== 200) {
