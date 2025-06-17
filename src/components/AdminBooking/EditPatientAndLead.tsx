@@ -28,7 +28,7 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
                                                                  title,
                                                                  dadosIniciais
                                                              }: EditPatientModalProps) => {
-    const [leadData, setLeadData] = useState<CreateLeadDTO>({} as CreateLeadDTO)
+    const [leadData, setLeadData] = useState<CreateLeadDTO>()
     const [canal, setCanal] = useState<IMarketing[]>([])
     const [selectedExame, setSelectedExame] = useState<string>('')
     const [selectedDoctor, setSelectedDoctor] = useState<string>('')
@@ -138,7 +138,7 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
         e.preventDefault()
         setErro(null)
 
-        if (!leadData.name || !leadData.phoneNumber || !selectedCanal || !selectedChannelContact) {
+        if (!leadData?.name || !leadData?.phoneNumber || !selectedCanal || !selectedChannelContact) {
             setErro('Por favor, preencha todos os campos obrigatórios: Nome, Telefone, Canal de Contato e Canal de Captação')
             return
         }
@@ -164,6 +164,7 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
                     diagnosis: leadData.diagnosis || undefined,
                     indication_name: leadData.indication_name || undefined
                 }
+                console.log(leadData)
 
                 const leadResponse = await updateLead(leadUpdateData, auth.tenantId)
                 if (!leadResponse || leadResponse.status !== 200) {
@@ -314,7 +315,7 @@ const EditPatientAndLead: React.FC<EditPatientModalProps> = ({
                                     id="diagnosis"
                                     name="diagnosis"
                                     type="text"
-                                    placeholder={leadData?.diagnosis}
+                                    value={leadData?.diagnosis}
                                     onChange={handleInputChange}
                                     className="h-16"
                                 />
